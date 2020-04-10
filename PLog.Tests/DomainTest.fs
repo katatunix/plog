@@ -3,7 +3,7 @@
 open NUnit.Framework
 open PLog.Domain
 
-let ADB = "/Users/nghia/DevTools/android-sdk-macosx/platform-tools/adb"
+let ADB = "/Users/nghia/DevTools/android-sdk/platform-tools/adb"
 
 [<Test>]
 let ``test fetchDevices`` () =

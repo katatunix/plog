@@ -4,6 +4,8 @@ open System
 open Eto.Forms
 open Eto.Drawing
 open EtoUtils
+open MonoMac.Foundation
+open MonoMac.AppKit
 
 type Mode = {
     BackColor : Color
@@ -23,7 +25,10 @@ type MacLogArea (isDark) as this =
     let rta = new TextArea (Wrap = false, ReadOnly = true, Font = codeFont,
                             BackgroundColor = currentMode.BackColor, TextColor = currentMode.TextColor)
 
-    let lb = new Label (Text = "   Find text", VerticalAlignment = VerticalAlignment.Center)
+    let ctrl = rta.ControlObject :?> NSTextView
+
+
+    let lb = new Label (Text = "Find text", VerticalAlignment = VerticalAlignment.Center)
     let tb = new TextBox (PlaceholderText = "Pressing Enter is the same as clicking the Next button")
     let nextButton = new Button (Text = "Next")
     let previousButton = new Button (Text = "Prev")
@@ -53,12 +58,13 @@ type MacLogArea (isDark) as this =
             if isForwarding then rta.Text.IndexOf (key, startIdx, sc)
             else rta.Text.LastIndexOf (key, startIdx, sc)
         if foundIdx = -1 then
-            MessageBox.Show (sprintf "Could not find or no longer find \"%s\"" key, MessageBoxType.Information) |> ignore
+            MessageBox.Show (sprintf "Could not find or no longer find \"%s\"." key, MessageBoxType.Information) |> ignore
         else
             keepEnd <- false
-            if System.isWindows then rta.Focus ()
-            rta.Selection <- Range (foundIdx, foundIdx + key.Length - 1)
-            rta.ScrollToSelection ()
+            let a = foundIdx
+            let b = foundIdx + key.Length - 1
+            rta.Selection <- Range (a, b)
+            ctrl.ScrollRangeToVisible (NSRange (int64 a, int64 b))
 
     let next () =
         if tb.Text.Length > 0 then
@@ -115,7 +121,7 @@ type MacLogArea (isDark) as this =
 
         member this.GoEnd () =
             keepEnd <- true
-            rta.ScrollToEnd ()
+            ctrl.ScrollRangeToVisible <| NSRange (int64 rta.Text.Length, 0L)
 
         member this.SetWrap value =
             rta.Wrap <- value

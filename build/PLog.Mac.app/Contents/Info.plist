@@ -27,6 +27,10 @@
     <key>CFBundleExecutable</key>
     <string>PLog.Mac</string>
     <key>LSMinimumSystemVersion</key>
-    <string>10.7</string>
+    <string>10.9</string>
+    <key>MonoMinimumVersion</key>
+    <string>5.10</string>
+    <key>NSRequiresAquaSystemAppearance</key>
+    <string>False</string>
   </dict>
 </plist>

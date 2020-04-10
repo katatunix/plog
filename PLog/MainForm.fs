@@ -6,7 +6,7 @@ open Eto.Drawing
 open EtoUtils
 
 type MainForm (mkLogArea : bool -> LogArea) as this =
-    inherit Form (Title = "PLog 8.5 | nghia.buivan@hotmail.com", Size = Size (1100, 720))
+    inherit Form (Title = "PLog 8.7 | nghia.buivan@hotmail.com", Size = Size (1100, 720))
 
     let pre = MainPresenter (this, Application.Instance.Invoke)
 
@@ -41,6 +41,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
     let deepClearButton = new Button (Text = "logcat -c", ToolTip = "Clear log in all filters and in device")
     let wrapCheckBox = new CheckBox (Text = "Wrap")
     let goEndButton = new Button (Text = "Go end")
+    let exportButton = new Button (Text = "Export")
 
     let dsymLabel = new Label (Text = "Dsym file", VerticalAlignment = VerticalAlignment.Center)
     let dsymTextBox = new TextBox (PlaceholderText = "Type/paste/browse the path to your dsym file here")
@@ -55,6 +56,8 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
 
     let getStacktraceFromFileButton = new Button (Text = "From log file", ToolTip = "Get stacktrace from external log file")
     let openLogFileDialog = new OpenFileDialog (Title = "Select log file", MultiSelect = false)
+    let exportFileDialog = new SaveFileDialog (Title = "Export log to text file")
+    do exportFileDialog.Filters.Add (new FileFilter ("Text", [|".txt"|]))
     
     do this.Content <- 
         mkLayout <| Tbl [
@@ -71,6 +74,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
                                     El deepClearButton
                                     El wrapCheckBox
                                     El goEndButton
+                                    El exportButton
                                     El dsymLabel
                                     StretchedEl dsymTextBox
                                     El browseDsymButton
@@ -95,6 +99,12 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
         clearButton.Click.Add (fun _ -> pre.Clear ())
         deepClearButton.Click.Add (fun _ -> pre.DeepClear deviceListDropDown.SelectedIndex)
         goEndButton.Click.Add (fun _ -> pre.GoEnd ())
+
+        exportButton.Click.Add (fun _ ->
+            if exportFileDialog.ShowDialog (this) = DialogResult.Ok then
+                pre.Export exportFileDialog.FileName
+        )
+
         wrapCheckBox.CheckedChanged.Add (fun _ ->
             for area in logAreas do
                 area.SetWrap wrapCheckBox.Checked.Value)

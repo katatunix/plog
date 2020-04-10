@@ -206,6 +206,11 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
     member this.GoEnd () =
         view.GoEnd curPageIdx
 
+    member this.Export (path: string) =
+        use stream = new System.IO.StreamWriter (path)
+        for item in logPages.[curPageIdx].LogItems do
+            stream.WriteLine item.Content
+
     member this.GetStacktrace _dsymFile stOption =
         dsymFile <- _dsymFile
         match stOption with

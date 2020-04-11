@@ -31,7 +31,7 @@ test-results/
 Thumbs.db
 
 # Mac bundle stuff
-*.dmg
+#*.dmg
 #*.app
 
 # resharper

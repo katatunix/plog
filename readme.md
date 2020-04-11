@@ -1,18 +1,19 @@
-PLog - a tool for viewing Android log and more
+PLog &ndash; a tool for viewing Android log and more
 ===
 
 ## Setup
 * Visual Studio (VS) 2017/2019 with F# support (Community / Professional / Enterprise).
 
 ## Build
-* Windows version:
-    * Project `PLog.Win`
+* Open `PLog.sln` with your Visual Studio.
+* To build Windows version:
+    * Build project `PLog.Win`.
     * Should be built on Windows to have correct app icons.
-* macOS version:
-    * Project `PLog.Mac`
+* To build macOS version:
+    * Build project `PLog.Mac`.
     * Must be built on macOS.
 
 ## Release
 * Make sure the two projects above are built in `Release` mode.
-* Run `release.sh` to copy all output files/folders to the `build` folder.
+* Run `./release.sh [version]` to copy all output files/folders to the `build` folder. For example: `./release.sh 8.5`.
 * See the artifacts in the `build` folder.

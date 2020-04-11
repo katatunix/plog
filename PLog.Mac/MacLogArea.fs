@@ -22,11 +22,10 @@ type MacLogArea (isDark) as this =
 
     let SPACE = Spacing (Size (5, 5))
 
-    let rta = new TextArea (Wrap = false, ReadOnly = true, Font = codeFont,
-                            BackgroundColor = currentMode.BackColor, TextColor = currentMode.TextColor)
+    let textArea = new TextArea (Wrap = false, ReadOnly = true, Font = codeFont,
+                                 BackgroundColor = currentMode.BackColor, TextColor = currentMode.TextColor)
 
-    let ctrl = rta.ControlObject :?> NSTextView
-
+    let textAreaControl = textArea.ControlObject :?> NSTextView
 
     let lb = new Label (Text = "Find text", VerticalAlignment = VerticalAlignment.Center)
     let tb = new TextBox (PlaceholderText = "Pressing Enter is the same as clicking the Next button")
@@ -45,37 +44,37 @@ type MacLogArea (isDark) as this =
                                       El previousButton
                                       El rewindButton
                                       ]]]
-            Row [TableEl <| Tbl [Row [El rta]]]
+            Row [TableEl <| Tbl [Row [El textArea]]]
         ]
 
     let mutable keepEnd = true
-    do rta.MouseDown.Add (fun _ -> keepEnd <- false)
-    do rta.MouseWheel.Add (fun _ -> keepEnd <- false)
+    do textArea.MouseDown.Add (fun _ -> keepEnd <- false)
+    do textArea.MouseWheel.Add (fun _ -> keepEnd <- false)
 
     let findAndSelect key startIdx isForwarding =
         let sc = StringComparison.CurrentCultureIgnoreCase
         let foundIdx =
-            if isForwarding then rta.Text.IndexOf (key, startIdx, sc)
-            else rta.Text.LastIndexOf (key, startIdx, sc)
+            if isForwarding then textArea.Text.IndexOf (key, startIdx, sc)
+            else textArea.Text.LastIndexOf (key, startIdx, sc)
         if foundIdx = -1 then
-            MessageBox.Show (sprintf "Could not find or no longer find \"%s\"." key, MessageBoxType.Information) |> ignore
+            MessageBox.Show (sprintf "Could not find or no longer find \"%s\"" key, MessageBoxType.Information) |> ignore
         else
             keepEnd <- false
             let a = foundIdx
             let b = foundIdx + key.Length - 1
-            rta.Selection <- Range (a, b)
-            ctrl.ScrollRangeToVisible (NSRange (int64 a, int64 b))
+            textArea.Selection <- Range (a, b)
+            textAreaControl.ScrollRangeToVisible (NSRange (int64 a, int64 b))
 
     let next () =
         if tb.Text.Length > 0 then
-            let selection = rta.Selection
-            let startIdx = if selection.Length () > 0 then selection.Start + 1 else rta.CaretIndex
+            let selection = textArea.Selection
+            let startIdx = if selection.Length () > 0 then selection.Start + 1 else textArea.CaretIndex
             findAndSelect tb.Text startIdx true
 
     let prev () =
         if tb.Text.Length > 0 then
-            let selection = rta.Selection
-            let startIdx = if selection.Length () > 0 then selection.End - 1 else rta.CaretIndex
+            let selection = textArea.Selection
+            let startIdx = if selection.Length () > 0 then selection.End - 1 else textArea.CaretIndex
             findAndSelect tb.Text startIdx false
 
     let rewind () =
@@ -94,18 +93,18 @@ type MacLogArea (isDark) as this =
         rewindButton.Click.Add (fun _ -> rewind ())
 
     member private this._Clear () =
-        rta.Text <- ""
+        textArea.Text <- ""
 
     member private this._AppendLines lines =
-        let sl = rta.Selection
-        rta.Append ((lines |> Seq.map fst |> String.concat Environment.NewLine) + Environment.NewLine, keepEnd)
-        rta.Selection <- sl
+        let sl = textArea.Selection
+        textArea.Append ((lines |> Seq.map fst |> String.concat Environment.NewLine) + Environment.NewLine, keepEnd)
+        textArea.Selection <- sl
 
     member this._ChangeMode mode lines =
         currentMode <- mode
         this._Clear ()
-        rta.BackgroundColor <- currentMode.BackColor
-        rta.TextColor <- currentMode.TextColor
+        textArea.BackgroundColor <- currentMode.BackColor
+        textArea.TextColor <- currentMode.TextColor
         this._AppendLines lines
 
     interface LogArea with
@@ -121,10 +120,10 @@ type MacLogArea (isDark) as this =
 
         member this.GoEnd () =
             keepEnd <- true
-            ctrl.ScrollRangeToVisible <| NSRange (int64 rta.Text.Length, 0L)
+            textAreaControl.ScrollRangeToVisible <| NSRange (int64 textArea.Text.Length, 0L)
 
         member this.SetWrap value =
-            rta.Wrap <- value
+            textArea.Wrap <- value
 
         member this.ChangeMode isDark lines =
             if isDark && currentMode <> darkMode then

@@ -15,7 +15,7 @@ type Mode = {
 type MacLogArea (isDark) as this =
     inherit Panel ()
 
-    static let darkMode = { BackColor = Colors.Black; TextColor = Colors.WhiteSmoke }
+    static let darkMode = { BackColor = Color.FromRgb 0x1e1e1e; TextColor = Color.FromRgb 0xfcfcfc }
     static let lightMode = { BackColor = Colors.White; TextColor = Colors.Black }
 
     let mutable currentMode = if isDark then darkMode else lightMode

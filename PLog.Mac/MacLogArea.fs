@@ -7,41 +7,62 @@ open EtoUtils
 open MonoMac.Foundation
 open MonoMac.AppKit
 
-type Mode = {
-    BackColor : Color
-    TextColor : Color
-}
+type Mode =
+    { BackColor: Color
+      ErrorColor: NSColor
+      WarningColor: NSColor
+      DebugColor: NSColor
+      InfoColor: NSColor }
 
 type MacLogArea (isDark) as this =
     inherit Panel ()
 
-    static let darkMode = { BackColor = Color.FromRgb 0x1e1e1e; TextColor = Color.FromRgb 0xfcfcfc }
-    static let lightMode = { BackColor = Colors.White; TextColor = Colors.Black }
+    static let darkMode =
+        { BackColor = Color.FromRgb 0x1e1e1e
+          ErrorColor = NSColor.SystemRedColor
+          WarningColor = NSColor.SystemYellowColor
+          DebugColor = NSColor.SystemGreenColor
+          InfoColor = NSColor.FromRgba (0.9, 0.9, 0.9, 1.0) }
+
+    static let lightMode =
+        { BackColor = Colors.WhiteSmoke
+          ErrorColor = NSColor.Red
+          WarningColor = NSColor.Brown
+          DebugColor = NSColor.Blue
+          InfoColor = NSColor.Black }
 
     let mutable currentMode = if isDark then darkMode else lightMode
 
-    let SPACE = Spacing (Size (5, 5))
+    let DIST = 5
 
-    let textArea = new TextArea (Wrap = false, ReadOnly = true, Font = codeFont,
-                                 BackgroundColor = currentMode.BackColor, TextColor = currentMode.TextColor)
+    let SPACE = Spacing (Size (DIST, DIST))
+
+    let font = NSFont.FromFontName ("Menlo", 11.5)
+
+    let textArea = new TextArea (Wrap = false, ReadOnly = true, BackgroundColor = currentMode.BackColor)
 
     let textAreaControl = textArea.ControlObject :?> NSTextView
 
-    let lb = new Label (Text = "Find text", VerticalAlignment = VerticalAlignment.Center)
-    let tb = new TextBox (PlaceholderText = "Pressing Enter is the same as clicking the Next button")
-    let nextButton = new Button (Text = "Next")
-    let previousButton = new Button (Text = "Prev")
+    do
+        use attrs = new NSMutableDictionary ()
+        attrs.Add (NSAttributedString.BackgroundColorAttributeName, NSColor.SystemBlueColor)
+        textAreaControl.SelectedTextAttributes <- attrs
+
+    let label = new Label (Text = "Find text", VerticalAlignment = VerticalAlignment.Center)
+    let textBox = new TextBox ()
+    let previousButton = new Button (Text = "◀︎")
+    let nextButton = new Button (Text = "▶︎")
     let rewindButton = new Button (Text = "Rewind")
 
     do this.Content <-
         mkLayout <| Tbl [
             SPACE
             Row [TableEl <| Tbl [SPACE
-                                 Row [
-                                      El lb
-                                      StretchedEl tb
-                                      El nextButton
+                                 Pad (Padding (DIST, 0, 0, 0))
+                                 Row [El label
+                                      StretchedEl textBox
                                       El previousButton
+                                      El nextButton
                                       El rewindButton
                                       ]]]
             Row [TableEl <| Tbl [Row [El textArea]]]
@@ -57,54 +78,74 @@ type MacLogArea (isDark) as this =
             if isForwarding then textArea.Text.IndexOf (key, startIdx, sc)
             else textArea.Text.LastIndexOf (key, startIdx, sc)
         if foundIdx = -1 then
-            MessageBox.Show (sprintf "Could not find or no longer find \"%s\"" key, MessageBoxType.Information) |> ignore
+            MessageBox.Show ("Text not found", MessageBoxType.Information) |> ignore
         else
             keepEnd <- false
-            let a = foundIdx
-            let b = foundIdx + key.Length - 1
-            textArea.Selection <- Range (a, b)
-            textAreaControl.ScrollRangeToVisible (NSRange (int64 a, int64 b))
+            let range = NSRange (int64 foundIdx, int64 key.Length)
+            textAreaControl.SelectedRange <- range
+            textAreaControl.ScrollRangeToVisible range
+            textArea.Focus()
 
     let next () =
-        if tb.Text.Length > 0 then
+        if textBox.Text.Length > 0 then
             let selection = textArea.Selection
             let startIdx = if selection.Length () > 0 then selection.Start + 1 else textArea.CaretIndex
-            findAndSelect tb.Text startIdx true
+            findAndSelect textBox.Text startIdx true
 
     let prev () =
-        if tb.Text.Length > 0 then
+        if textBox.Text.Length > 0 then
             let selection = textArea.Selection
             let startIdx = if selection.Length () > 0 then selection.End - 1 else textArea.CaretIndex
-            findAndSelect tb.Text startIdx false
+            findAndSelect textBox.Text startIdx false
 
     let rewind () =
-        if tb.Text.Length > 0 then
+        if textBox.Text.Length > 0 then
             let startIdx = 0
-            findAndSelect tb.Text startIdx true
+            findAndSelect textBox.Text startIdx true
 
     do
-        let mutable enterDown = false
-        tb.KeyDown.Add (fun e -> if e.Key = Keys.Enter then enterDown <- true)
-        tb.KeyUp.Add (fun e -> if e.Key = Keys.Enter then
-                                   if enterDown then enterDown <- false; next ())
-
         nextButton.Click.Add (fun _ -> next ())
         previousButton.Click.Add (fun _ -> prev ())
         rewindButton.Click.Add (fun _ -> rewind ())
+
+        let mutable enterDown = false
+        textBox.KeyDown.Add (fun e -> if e.Key = Keys.Enter then enterDown <- true)
+        textBox.KeyUp.Add (fun e -> if e.Key = Keys.Enter then
+                                        if enterDown then enterDown <- false; rewind ())
+
+        textArea.KeyDown.Add (fun e -> if e.Application && e.Key = Keys.G then
+                                            e.Handled <- true
+                                            if e.Shift then prev () else next ())
 
     member private this._Clear () =
         textArea.Text <- ""
 
     member private this._AppendLines lines =
-        let sl = textArea.Selection
-        textArea.Append ((lines |> Seq.map fst |> String.concat Environment.NewLine) + Environment.NewLine, keepEnd)
-        textArea.Selection <- sl
+        let mutable len = uint64 textAreaControl.TextStorage.Length
+        for (line, severity) in lines do
+            let color =
+                match severity with
+                | Domain.Err     -> currentMode.ErrorColor
+                | Domain.Warning -> currentMode.WarningColor
+                | Domain.Debug   -> currentMode.DebugColor
+                | Domain.Info    -> currentMode.InfoColor
+
+            use str = new NSMutableAttributedString (line + Environment.NewLine)
+            use attrs = new NSMutableDictionary ()
+            attrs.Add (NSAttributedString.ForegroundColorAttributeName, color)
+            attrs.Add (NSAttributedString.FontAttributeName, font)
+            str.AddAttributes (attrs, NSRange (0L, str.Length))
+
+            textAreaControl.TextStorage.Insert (str, len)
+            len <- len + uint64 str.Length
+
+        if keepEnd then
+            textAreaControl.ScrollRangeToVisible <| NSRange (int64 len, 0L)
 
     member this._ChangeMode mode lines =
         currentMode <- mode
         this._Clear ()
         textArea.BackgroundColor <- currentMode.BackColor
-        textArea.TextColor <- currentMode.TextColor
         this._AppendLines lines
 
     interface LogArea with

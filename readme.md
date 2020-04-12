@@ -13,7 +13,7 @@ PLog &ndash; a tool for viewing Android log and more
     * Build project `PLog.Mac`.
     * Must be built on macOS.
 
-## Release
+## Pack
 * Make sure the two projects above are built in `Release` mode.
-* Run `./release.sh [version]` to copy all output files/folders to the `build` folder. For example: `./release.sh 8.5`.
+* Run `./pack.sh [version]` to copy all output files/folders to the `build` folder. For example: `./pack.sh 8.5`.
 * See the artifacts in the `build` folder.

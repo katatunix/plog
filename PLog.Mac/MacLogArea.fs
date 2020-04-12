@@ -114,8 +114,12 @@ type MacLogArea (isDark) as this =
                                         if enterDown then enterDown <- false; rewind ())
 
         textArea.KeyDown.Add (fun e -> if e.Application && e.Key = Keys.G then
-                                            e.Handled <- true
-                                            if e.Shift then prev () else next ())
+                                           e.Handled <- true
+                                           if e.Shift then prev () else next ()
+                                       elif e.Application && e.Key = Keys.Down then
+                                           keepEnd <- true
+                                       elif e.Key = Keys.Up || e.Key = Keys.Down then
+                                           keepEnd <- false)
 
     member private this._Clear () =
         textArea.Text <- ""

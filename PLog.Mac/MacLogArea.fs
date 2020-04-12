@@ -1,6 +1,7 @@
 ﻿namespace PLog
 
 open System
+open System.Text
 open Eto.Forms
 open Eto.Drawing
 open EtoUtils
@@ -124,27 +125,42 @@ type MacLogArea (isDark) as this =
     member private this._Clear () =
         textArea.Text <- ""
 
+    member private this._Append (text: string) severity =
+        let color =
+            match severity with
+            | Domain.Err     -> currentMode.ErrorColor
+            | Domain.Warning -> currentMode.WarningColor
+            | Domain.Debug   -> currentMode.DebugColor
+            | Domain.Info    -> currentMode.InfoColor
+        use str = new NSMutableAttributedString (text)
+        use attrs = new NSMutableDictionary ()
+        attrs.Add (NSAttributedString.ForegroundColorAttributeName, color)
+        attrs.Add (NSAttributedString.FontAttributeName, font)
+        str.AddAttributes (attrs, NSRange (0L, str.Length))
+        textAreaControl.TextStorage.Append (str)
+
     member private this._AppendLines lines =
-        let mutable len = uint64 textAreaControl.TextStorage.Length
-        for (line, severity) in lines do
-            let color =
-                match severity with
-                | Domain.Err     -> currentMode.ErrorColor
-                | Domain.Warning -> currentMode.WarningColor
-                | Domain.Debug   -> currentMode.DebugColor
-                | Domain.Info    -> currentMode.InfoColor
+        let mutable isFirst = true
+        let mutable currentSeverity = Domain.Err
+        let collectedString = StringBuilder ()
 
-            use str = new NSMutableAttributedString (line + Environment.NewLine)
-            use attrs = new NSMutableDictionary ()
-            attrs.Add (NSAttributedString.ForegroundColorAttributeName, color)
-            attrs.Add (NSAttributedString.FontAttributeName, font)
-            str.AddAttributes (attrs, NSRange (0L, str.Length))
+        for (text, severity) in lines do
+            if isFirst then
+                isFirst <- false
+                currentSeverity <- severity
+                collectedString.AppendLine text |> ignore
+            elif severity = currentSeverity then
+                collectedString.AppendLine text |> ignore
+            else
+                this._Append (collectedString.ToString()) currentSeverity
+                currentSeverity <- severity
+                collectedString.Clear().AppendLine(text) |> ignore
 
-            textAreaControl.TextStorage.Insert (str, len)
-            len <- len + uint64 str.Length
+        if collectedString.Length > 0 then
+            this._Append (collectedString.ToString()) currentSeverity
 
         if keepEnd then
-            textAreaControl.ScrollRangeToVisible <| NSRange (int64 len, 0L)
+            textAreaControl.ScrollRangeToVisible <| NSRange (textAreaControl.TextStorage.Length, 0L)
 
     member this._ChangeMode mode lines =
         currentMode <- mode

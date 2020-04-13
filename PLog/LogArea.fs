@@ -6,4 +6,4 @@ type LogArea =
     abstract AppendLines : seq<string * Domain.Severity> -> unit
     abstract GoEnd : unit -> unit
     abstract SetWrap : bool -> unit
-    abstract ChangeMode : bool -> seq<string * Domain.Severity> -> unit
+    abstract ChangeMode : bool -> unit

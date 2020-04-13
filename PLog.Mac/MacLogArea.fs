@@ -162,11 +162,9 @@ type MacLogArea (isDark) as this =
         if keepEnd then
             textAreaControl.ScrollRangeToVisible <| NSRange (textAreaControl.TextStorage.Length, 0L)
 
-    member this._ChangeMode mode lines =
+    member this._ChangeMode mode =
         currentMode <- mode
-        this._Clear ()
         textArea.BackgroundColor <- currentMode.BackColor
-        this._AppendLines lines
 
     interface LogArea with
 
@@ -186,8 +184,8 @@ type MacLogArea (isDark) as this =
         member this.SetWrap value =
             textArea.Wrap <- value
 
-        member this.ChangeMode isDark lines =
+        member this.ChangeMode isDark =
             if isDark && currentMode <> darkMode then
-                this._ChangeMode darkMode lines
+                this._ChangeMode darkMode
             elif not isDark && currentMode <> lightMode then
-                this._ChangeMode lightMode lines
+                this._ChangeMode lightMode

@@ -66,12 +66,10 @@ type WinLogArea (isDark) =
         fctb.Selection.EndUpdate ()
         fctb.EndUpdate ()
 
-    member private this._ChangeMode mode lines =
+    member private this._ChangeMode mode =
         currentMode <- mode
-        fctb.Clear ()
         fctb.BackColor <- currentMode.BackColor
         fctb.SelectionColor <- currentMode.SelColor
-        this._AppendLines lines
     
     interface LogArea with
 
@@ -90,8 +88,8 @@ type WinLogArea (isDark) =
         member this.AppendLines lines =
             this._AppendLines lines
 
-        member this.ChangeMode isDark lines =
+        member this.ChangeMode isDark =
             if isDark && currentMode <> darkMode then
-                this._ChangeMode darkMode lines
+                this._ChangeMode darkMode
             elif not isDark && currentMode <> lightMode then
-                this._ChangeMode lightMode lines
+                this._ChangeMode lightMode

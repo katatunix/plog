@@ -177,7 +177,9 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
             (new ScreenshotDialog (adb, device, deviceTitle)).ShowModal ()
 
         member this.ChangeMode isDark idx lines =
-            logAreas.[idx].ChangeMode isDark lines
+            logAreas.[idx].Clear ()
+            logAreas.[idx].ChangeMode isDark
+            logAreas.[idx].AppendLines lines
 
         member this.SetModeCheckBox value =
             modeCheckBox.Checked <- System.Nullable(value)

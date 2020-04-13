@@ -4,6 +4,8 @@ ver=$1
 rm -dfr $buildDir
 mkdir $buildDir
 
+cp -pv PLog.Mac/Info.plist PLog.Mac/bin/Release/PLog.Mac.app/Contents
+
 ./tools/create-dmg/create-dmg \
     --window-pos 200 120 \
     --window-size 800 400 \

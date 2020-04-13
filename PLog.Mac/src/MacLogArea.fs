@@ -114,9 +114,15 @@ type MacLogArea (isDark) as this =
         textBox.KeyUp.Add (fun e -> if e.Key = Keys.Enter then
                                         if enterDown then enterDown <- false; rewind ())
 
-        textArea.KeyDown.Add (fun e -> if e.Application && e.Key = Keys.G then
+        textArea.KeyDown.Add (fun e -> if e.Key = Keys.Enter then
+                                           e.Handled <- true
+                                           next ()
+                                       elif e.Application && e.Key = Keys.G then
                                            e.Handled <- true
                                            if e.Shift then prev () else next ()
+                                       elif e.Application && e.Key = Keys.F then
+                                           e.Handled <- true
+                                           textBox.Focus ()
                                        elif e.Application && e.Key = Keys.Down then
                                            keepEnd <- true
                                        elif e.Key = Keys.Up || e.Key = Keys.Down then

@@ -105,9 +105,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
                 pre.Export exportFileDialog.FileName
         )
 
-        wrapCheckBox.CheckedChanged.Add (fun _ ->
-            for area in logAreas do
-                area.SetWrap wrapCheckBox.Checked.Value)
+        wrapCheckBox.CheckedChanged.Add (fun _ -> pre.SetWrap wrapCheckBox.Checked.Value)
 
         getStacktraceButton.Click.Add (fun _ -> pre.GetStacktrace dsymTextBox.Text LiveLog)
         getStacktraceFromFileButton.Click.Add (fun _ ->
@@ -183,3 +181,8 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
 
         member this.SetModeCheckBox value =
             modeCheckBox.Checked <- System.Nullable(value)
+
+        member this.SetWrap value idx lines =
+            logAreas.[idx].Clear ()
+            logAreas.[idx].SetWrap value
+            logAreas.[idx].AppendLines lines

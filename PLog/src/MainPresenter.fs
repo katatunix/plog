@@ -24,6 +24,7 @@ type MainView =
     abstract OpenScreenshot : adb:string -> Device -> deviceTitle:string -> unit
     abstract ChangeMode : isDark:bool -> idx:int -> seq<string * Severity> -> unit
     abstract SetModeCheckBox : bool -> unit
+    abstract SetWrap : value:bool -> idx:int -> seq<string * Severity> -> unit
 
 type StacktraceOption =
     | LiveLog
@@ -239,6 +240,14 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
             page.LogItems
             |> Seq.map (fun item -> item.Content, item.Severity)
             |> view.ChangeMode isDark i
+        )
+
+    member this.SetWrap value =
+        logPages
+        |> Seq.iteri (fun i page ->
+            page.LogItems
+            |> Seq.map (fun item -> item.Content, item.Severity)
+            |> view.SetWrap value i
         )
 
     member this.Exit _dsymFile =

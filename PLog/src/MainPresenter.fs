@@ -110,7 +110,7 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
         match killFun with
         | None ->
             if devices.Length = 0 then
-                view.ShowError "No device selected"
+                view.ShowError "No device selected."
             else
                 resetLog ()
                 connectionId <- connectionId + 1
@@ -150,7 +150,7 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
     member private this.Disconnected () =
         killFun <- None
         view.UpdateConnectButton CONNECT
-        view.ShowError "Device disconnected"
+        view.ShowError "Device disconnected."
 
     member this.AddFilter filter =
         let page = LogPage (filter,
@@ -167,7 +167,7 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
 
     member this.RemoveFilter () =
         if curPageIdx = 0 then
-            view.ShowError "Could not remove MAIN filter"
+            view.ShowError "Could not remove MAIN filter."
         else
             let i = curPageIdx
             logPages.RemoveAt i
@@ -196,7 +196,7 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
 
     member this.DeepClear deviceIdx =
         if devices.Length = 0 then
-            view.ShowError "No device selected"
+            view.ShowError "No device selected."
         else
             resetLog ()
             match Domain.logcatClear adb (Some devices.[deviceIdx]) with
@@ -227,7 +227,7 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
 
     member this.OpenScreenshot deviceIdx =
         if devices.Length = 0 then
-            view.ShowError "No device selected"
+            view.ShowError "No device selected."
         else
             let device = devices.[deviceIdx]
             view.OpenScreenshot adb device (formatDevice device)

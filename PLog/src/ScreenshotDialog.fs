@@ -28,7 +28,7 @@ type ScreenshotDialog (adb, device, deviceTitle) as this =
         try
             Ok (new Bitmap (stream))
         with _ ->
-            Error "Could not capture screenshot for the current device"
+            Error "Could not capture screenshot for the current device."
 
     let capture () =
         let comp = async {

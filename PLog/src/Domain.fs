@@ -202,16 +202,16 @@ let private toOption (str : string) =
 
 let createFilter (name : string) (tag : string) (pid : string) =
     result {
-        let! name = name |> toOption |> Result.ofOption "Filter name cannot be empty"
+        let! name = name |> toOption |> Result.ofOption "Filter name cannot be empty."
         let tag = tag |> toOption
         let pid = pid |> toOption
         match tag, pid with
         | None, None ->
-            return! Error "At least Tag or PID must be provided"
+            return! Error "At least Tag or PID must be provided."
         | _, None ->
             return { Name = name; Info = { Tag = tag; Pid = None } }
         | _, Some pid ->
-            let! pid = pid |> parseInt |> Result.ofOption "PID must be an integer"
+            let! pid = pid |> parseInt |> Result.ofOption "PID must be an integer number."
             return { Name = name; Info = { Tag = tag; Pid = Some pid } }
     }
     
@@ -244,7 +244,7 @@ let private getStacktraceFromFile dsymFile logFile =
         if IO.FileInfo(logFile).Length <= tenMB_in_bytes then
             IO.File.ReadAllLines logFile |> Ok
         else
-            Error "Log file size cannot be bigger than 10 MB"
+            Error "Log file size cannot be bigger than 10 MB."
     with ex ->
         Error ex.Message
     |> Result.bind (getStacktraceFromLive dsymFile)

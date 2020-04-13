@@ -79,7 +79,7 @@ type MacLogArea (isDark) as this =
             if isForwarding then textArea.Text.IndexOf (key, startIdx, sc)
             else textArea.Text.LastIndexOf (key, startIdx, sc)
         if foundIdx = -1 then
-            MessageBox.Show ("Text not found", MessageBoxType.Information) |> ignore
+            MessageBox.Show ("Text not found.", MessageBoxType.Information) |> ignore
         else
             keepEnd <- false
             let range = NSRange (int64 foundIdx, int64 key.Length)

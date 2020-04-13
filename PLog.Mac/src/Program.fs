@@ -6,5 +6,6 @@ open PLog
 [<EntryPoint; STAThread>]
 let main argv =
     let mkLogArea isDark = new MacLogArea (isDark) :> LogArea
-    (new Eto.Forms.Application ()).Run (new MainForm (mkLogArea))
+    let app = new Eto.Forms.Application (Eto.Platforms.Mac64)
+    app.Run (new MainForm (mkLogArea))
     0

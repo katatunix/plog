@@ -219,9 +219,9 @@ let private (+/) p1 p2 = Path.Combine (p1, p2)
 
 let private addr2line =
     if System.isWindows then
-        AppDomain.CurrentDomain.BaseDirectory +/ "tools" +/ "aarch64-linux-android-addr2line.exe"
+        AppDomain.CurrentDomain.BaseDirectory +/ "addr2line.exe"
     else
-        AppDomain.CurrentDomain.BaseDirectory +/ ".." +/ "Resources" +/ "aarch64-linux-android-addr2line"
+        AppDomain.CurrentDomain.BaseDirectory +/ "../Resources" +/ "addr2line"
 
 let private parseAddresses lines = [
     for line in lines do

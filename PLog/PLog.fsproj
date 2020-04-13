@@ -1,81 +1,24 @@
-﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0CE651F6-4B5D-44A2-948A-DC91073E703F}</ProjectGuid>
-    <UseStandardResourceNames>true</UseStandardResourceNames>
-    <OutputType>Library</OutputType>
-    <RootNamespace>PLog</RootNamespace>
-    <AssemblyName>PLog</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <PlatformTarget></PlatformTarget>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <DefineConstants></DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
     <GenerateTailCalls>true</GenerateTailCalls>
-    <PlatformTarget></PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup>
-    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(VisualStudioVersion)' == '10.0' OR '$(VisualStudioVersion)' == '11.0'">
-    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
-  </PropertyGroup>
+  </PropertyGroup>  
   <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="FSharp.Core">
-      <HintPath>..\packages\FSharp.Core.4.7.1\lib\net45\FSharp.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="Eto">
-      <HintPath>..\packages\Eto.Forms.2.5.0\lib\netstandard1.0\Eto.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.ComponentModel.Primitives">
-      <HintPath>..\packages\System.ComponentModel.Primitives.4.3.0\lib\net45\System.ComponentModel.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.TypeConverter">
-      <HintPath>..\packages\System.ComponentModel.TypeConverter.4.3.0\lib\net45\System.ComponentModel.TypeConverter.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
-      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
+    <Compile Include="src\Result.fs" />
+    <Compile Include="src\System.fs" />
+    <Compile Include="src\IO.fs" />
+    <Compile Include="src\Process.fs" />
+    <Compile Include="src\Domain.fs" />
+    <Compile Include="src\EtoUtils.fs" />
+    <Compile Include="src\LogArea.fs" />
+    <Compile Include="src\ScreenshotDialog.fs" />
+    <Compile Include="src\ConfigDialog.fs" />
+    <Compile Include="src\StacktraceDialog.fs" />
+    <Compile Include="src\AddFilterDialog.fs" />
+    <Compile Include="src\MainPresenter.fs" />
+    <Compile Include="src\MainForm.fs" />
+    <PackageReference Include="Eto.Forms" Version="2.5.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Result.fs" />
-    <Compile Include="System.fs" />
-    <Compile Include="IO.fs" />
-    <Compile Include="Process.fs" />
-    <Compile Include="Domain.fs" />
-    <Compile Include="EtoUtils.fs" />
-    <Compile Include="LogArea.fs" />
-    <Compile Include="ScreenshotDialog.fs" />
-    <Compile Include="ConfigDialog.fs" />
-    <Compile Include="StacktraceDialog.fs" />
-    <Compile Include="AddFilterDialog.fs" />
-    <Compile Include="MainPresenter.fs" />
-    <Compile Include="MainForm.fs" />
-  </ItemGroup>
-  <Import Project="$(FSharpTargetsPath)" />
-  <Import Project="..\packages\Eto.Forms.2.5.0\build\Eto.Forms.targets" Condition="Exists('..\packages\Eto.Forms.2.5.0\build\Eto.Forms.targets')" />
 </Project>

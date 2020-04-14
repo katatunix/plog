@@ -8,7 +8,7 @@ mkdir $buildDir
     --window-pos 200 120 \
     --window-size 800 400 \
     --app-drop-link 550 185 \
-    $buildDir/PLog.Mac.$ver.dmg PLog.Mac/bin/Release/net461/PLog.Mac.app
+    $buildDir/PLog.Mac.$ver.dmg PLog.Mac/bin/Debug/netcoreapp3.1/PLog.Mac.app
 
 from=PLog.Win/bin/Release/net461
 to=$buildDir/PLog.Win.$ver

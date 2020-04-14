@@ -1,1 +1,1 @@
-dotnet build PLog.Mac/PLog.Mac.fsproj -c Release
+dotnet build PLog.Mac/PLog.Mac.fsproj -c Debug

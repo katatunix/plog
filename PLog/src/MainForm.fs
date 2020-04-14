@@ -6,7 +6,7 @@ open Eto.Drawing
 open EtoUtils
 
 type MainForm (mkLogArea : bool -> LogArea) as this =
-    inherit Form (Title = "PLog 9.1 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
+    inherit Form (Title = "PLog 9.2 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
 
     let pre = MainPresenter (this, Application.Instance.Invoke)
 

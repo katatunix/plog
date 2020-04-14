@@ -4,6 +4,9 @@
     <TargetFrameworks>net461</TargetFrameworks>
     <Win32Resource>AppIcon.res</Win32Resource>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <GenerateTailCalls>true</GenerateTailCalls>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\WinLogArea.fs" />
     <Compile Include="src\Program.fs" />

@@ -1,6 +1,6 @@
 /build/
-
 /.vs/
+*.fsproj.user
 
 # Autosave files
 *~

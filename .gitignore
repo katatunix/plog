@@ -1,6 +1,7 @@
 /build/
 /.vs/
 *.fsproj.user
+mono_crash*
 
 # Autosave files
 *~

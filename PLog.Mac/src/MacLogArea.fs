@@ -51,8 +51,8 @@ type MacLogArea (isDark) as this =
 
     let label = new Label (Text = "Find text", VerticalAlignment = VerticalAlignment.Center)
     let textBox = new TextBox ()
-    let previousButton = new Button (Text = "◀︎")
-    let nextButton = new Button (Text = "▶︎")
+    let previousButton = new Button (Text = "◀︎", MinimumSize = Size (40, -1))
+    let nextButton = new Button (Text = "▶︎", MinimumSize = Size (40, -1))
     let rewindButton = new Button (Text = "Rewind")
 
     do this.Content <-

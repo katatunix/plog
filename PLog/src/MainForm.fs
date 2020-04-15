@@ -6,7 +6,7 @@ open Eto.Drawing
 open EtoUtils
 
 type MainForm (mkLogArea : bool -> LogArea) as this =
-    inherit Form (Title = "PLog 9.2 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
+    inherit Form (Title = "PLog 9.3 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
 
     let pre = MainPresenter (this, Application.Instance.Invoke)
 
@@ -38,7 +38,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
 
     let modeCheckBox = new CheckBox (Text = "Dark mode")
     let clearButton = new Button (Text = "Clear", ToolTip = "Clear log in all filters")
-    let deepClearButton = new Button (Text = "logcat -c", ToolTip = "Clear log in all filters and in device")
+    let deepClearButton = new Button (Text = "Clear in device", ToolTip = "Clear log in all filters and in device")
     let wrapCheckBox = new CheckBox (Text = "Wrap")
     let goEndButton = new Button (Text = "Go end")
     let exportButton = new Button (Text = "Export")

@@ -35,8 +35,12 @@ type LogPage (filter, logItems) =
     member val LogItems : List<LogItem> = logItems
     member val UnreadCount = 0 with get, set
     new (filter) = LogPage (filter, List ())
-    
+
 type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
+    static let MAX_LOG_LINES = 40000
+    static let CONNECT = "Connect"
+    static let DISCONNECT = "Disconnect"
+
     let mutable adb = ""
     let mutable devices : Device [] = Array.empty
     let mutable connectionId = 0
@@ -44,11 +48,8 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
     let logPages = List<LogPage> ()
     let mutable curPageIdx = 0
     let mutable dsymFile = ""
-    let mutable negative : FilterInfo [] = Array.empty
+    let mutable negativeFilterInfos : FilterInfo [] = Array.empty
     let mutable isDark = false
-
-    let CONNECT = "Connect"
-    let DISCONNECT = "Disconnect"
 
     let formatDevice (device : Device) =
         match device.Model with
@@ -77,7 +78,7 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
 
         adb <- config.Adb
         dsymFile <- config.DsymFile
-        negative <- config.Negative
+        negativeFilterInfos <- config.Negative
         isDark <- config.IsDark
 
         logPages.Add (LogPage (mainFilter))
@@ -132,7 +133,8 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
 
     member private this.LogItemsReceived connId items =
         if killFun.IsSome && connectionId = connId then
-            let isNegative item = negative |> Array.exists (fun info -> Domain.matchesFilter info item)
+            let isNegative item = negativeFilterInfos |> Array.exists (fun info -> Domain.matchesFilter info item)
+
             logPages
             |> Seq.iteri (fun i page ->
                 let matchedItems = List ()
@@ -147,6 +149,11 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
                 if matchedItems.Count > 0 then
                     view.AppendLogItems i matchedItems
             )
+
+            if logPages.[0].LogItems.Count > MAX_LOG_LINES then
+                disconnect ()
+                view.ShowError <| sprintf "Stopped due to too much log (%d lines). It is recommented to clear log in the device before continuing."
+                                          MAX_LOG_LINES
 
     member private this.Disconnected () =
         killFun <- None
@@ -220,11 +227,11 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
         |> view.OpenStacktrace dsymFile
 
     member this.OpenConfig () =
-        view.OpenConfig adb negative
+        view.OpenConfig adb negativeFilterInfos
 
     member this.UpdateConfig _adb _negative =
         adb <- _adb
-        negative <- _negative
+        negativeFilterInfos <- _negative
 
     member this.OpenScreenshot deviceIdx =
         if devices.Length = 0 then
@@ -254,4 +261,4 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
         dsymFile <- _dsymFile
         disconnect ()
         let filters = logPages |> Seq.tail |> Seq.map (fun page -> page.Filter) |> List.ofSeq
-        Domain.saveConfig { Adb = adb; DsymFile = dsymFile; Filters = filters; Negative = negative; IsDark = isDark }
+        Domain.saveConfig { Adb = adb; DsymFile = dsymFile; Filters = filters; Negative = negativeFilterInfos; IsDark = isDark }

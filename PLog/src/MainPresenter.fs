@@ -139,25 +139,31 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
     member private this.AddLogItems items =
         let isNegative item = negativeFilterInfos |> Array.exists (fun info -> Domain.matchesFilter info item)
 
-        logPages
-        |> Seq.iteri (fun i page ->
-            let matchedItems = List ()
-            for item in items do
-                if not (isNegative item) && Domain.matchesFilter page.Filter.Info item then
-                    if i <> curPageIdx then
-                        page.UnreadCount <- page.UnreadCount + 1
-                    page.LogItems.Add item
-                    matchedItems.Add (item.Content, item.Severity)
-            if page.UnreadCount > 0 then
-                view.UpdateFilterLabel i (formatFilterLabel page.Filter.Name page.UnreadCount)
-            if matchedItems.Count > 0 then
-                view.AppendLogItems i matchedItems
-        )
+        let matchedItemss =
+            logPages
+            |> Seq.mapi (fun i page ->
+                items
+                |> Seq.filter (fun item -> item |> isNegative |> not && item |> Domain.matchesFilter page.Filter.Info)
+                |> Array.ofSeq
+            )
+            |> List.ofSeq
 
-        if logPages.[0].LogItems.Count > MAX_LOG_LINES then
+        let numLines = logPages.[0].LogItems.Count + matchedItemss.[0].Length
+        if numLines > MAX_LOG_LINES then
             disconnect ()
             view.ShowError <| sprintf "Stopped due to too much log (%d lines). It is recommented to clear log in the device before continuing."
-                                      MAX_LOG_LINES
+                                      numLines
+        else
+            (logPages, matchedItemss)
+            ||> Seq.iteri2 (fun i page matchedItems ->
+                page.LogItems.AddRange matchedItems
+                if i <> curPageIdx then
+                    page.UnreadCount <- page.UnreadCount + matchedItems.Length
+                if page.UnreadCount > 0 then
+                    view.UpdateFilterLabel i (formatFilterLabel page.Filter.Name page.UnreadCount)
+                if matchedItems.Length > 0 then
+                    view.AppendLogItems i (matchedItems |> Seq.map (fun item -> item.Content, item.Severity))
+            )
 
     member private this.LogItemsReceived connId items =
         if killFun.IsSome && connectionId = connId then

@@ -131,29 +131,37 @@ type MainPresenter (view : MainView, invoke : (unit -> unit) -> unit) =
         | Some _ ->
             disconnect ()
 
+    member this.Import file =
+        System.IO.File.ReadAllLines file
+        |> Seq.map Domain.parseLogItem
+        |> this.AddLogItems
+
+    member private this.AddLogItems items =
+        let isNegative item = negativeFilterInfos |> Array.exists (fun info -> Domain.matchesFilter info item)
+
+        logPages
+        |> Seq.iteri (fun i page ->
+            let matchedItems = List ()
+            for item in items do
+                if not (isNegative item) && Domain.matchesFilter page.Filter.Info item then
+                    if i <> curPageIdx then
+                        page.UnreadCount <- page.UnreadCount + 1
+                    page.LogItems.Add item
+                    matchedItems.Add (item.Content, item.Severity)
+            if page.UnreadCount > 0 then
+                view.UpdateFilterLabel i (formatFilterLabel page.Filter.Name page.UnreadCount)
+            if matchedItems.Count > 0 then
+                view.AppendLogItems i matchedItems
+        )
+
+        if logPages.[0].LogItems.Count > MAX_LOG_LINES then
+            disconnect ()
+            view.ShowError <| sprintf "Stopped due to too much log (%d lines). It is recommented to clear log in the device before continuing."
+                                      MAX_LOG_LINES
+
     member private this.LogItemsReceived connId items =
         if killFun.IsSome && connectionId = connId then
-            let isNegative item = negativeFilterInfos |> Array.exists (fun info -> Domain.matchesFilter info item)
-
-            logPages
-            |> Seq.iteri (fun i page ->
-                let matchedItems = List ()
-                for item in items do
-                    if not (isNegative item) && Domain.matchesFilter page.Filter.Info item then
-                        if i <> curPageIdx then
-                            page.UnreadCount <- page.UnreadCount + 1
-                        page.LogItems.Add item
-                        matchedItems.Add (item.Content, item.Severity)
-                if page.UnreadCount > 0 then
-                    view.UpdateFilterLabel i (formatFilterLabel page.Filter.Name page.UnreadCount)
-                if matchedItems.Count > 0 then
-                    view.AppendLogItems i matchedItems
-            )
-
-            if logPages.[0].LogItems.Count > MAX_LOG_LINES then
-                disconnect ()
-                view.ShowError <| sprintf "Stopped due to too much log (%d lines). It is recommented to clear log in the device before continuing."
-                                          MAX_LOG_LINES
+            this.AddLogItems items
 
     member private this.Disconnected () =
         killFun <- None

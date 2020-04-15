@@ -42,6 +42,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
     let wrapCheckBox = new CheckBox (Text = "Wrap")
     let goEndButton = new Button (Text = "Go end")
     let exportButton = new Button (Text = "Export")
+    let importButton = new Button (Text = "Import")
 
     let dsymLabel = new Label (Text = "Dsym file", VerticalAlignment = VerticalAlignment.Center)
     let dsymTextBox = new TextBox (PlaceholderText = "Type/paste/browse the path to your dsym file here")
@@ -56,8 +57,11 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
 
     let getStacktraceFromFileButton = new Button (Text = "From log file", ToolTip = "Get stacktrace from external log file")
     let openLogFileDialog = new OpenFileDialog (Title = "Select log file", MultiSelect = false)
+
     let exportFileDialog = new SaveFileDialog (Title = "Export log to text file")
     do exportFileDialog.Filters.Add (new FileFilter ("Text", [|".txt"|]))
+
+    let importFileDialog = new OpenFileDialog (Title = "Import log from text file", MultiSelect = false)
     
     do this.Content <- 
         mkLayout <| Tbl [
@@ -75,6 +79,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
                                     El wrapCheckBox
                                     El goEndButton
                                     El exportButton
+                                    El importButton
                                     El dsymLabel
                                     StretchedEl dsymTextBox
                                     El browseDsymButton
@@ -103,6 +108,11 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
         exportButton.Click.Add (fun _ ->
             if exportFileDialog.ShowDialog (this) = DialogResult.Ok then
                 pre.Export exportFileDialog.FileName
+        )
+
+        importButton.Click.Add (fun _ ->
+            if importFileDialog.ShowDialog (this) = DialogResult.Ok then
+                pre.Import importFileDialog.FileName
         )
 
         wrapCheckBox.CheckedChanged.Add (fun _ -> pre.SetWrap wrapCheckBox.Checked.Value)

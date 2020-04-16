@@ -14,7 +14,8 @@ echo -e "\033[1;96m======== Packing macOS version ========\033[0m"
 ./tools/create-dmg/create-dmg \
     --window-pos 200 120 \
     --window-size 800 400 \
-    --app-drop-link 550 185 \
+    --app-drop-link 400 200 \
+    --add-file readme.txt build.sample/readme.txt 550 32 \
     $buildDir/PLog.Mac.$ver.dmg PLog.Mac/bin/Debug/netcoreapp3.1/PLog.Mac.app
 
 echo -e "\033[1;96m======== Packing Windows version ========\033[0m"

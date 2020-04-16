@@ -1,15 +1,23 @@
-buildDir=build
+#!/bin/bash
 ver=$1
+if [[ "$ver" == "" ]]; then
+    echo -e "\033[1;31mError: version is required.\033[0m"
+    exit 1
+fi
+
+buildDir=build
 
 rm -dfr $buildDir
 mkdir $buildDir
 
+echo -e "\033[1;96m======== Packing macOS version ========\033[0m"
 ./tools/create-dmg/create-dmg \
     --window-pos 200 120 \
     --window-size 800 400 \
     --app-drop-link 550 185 \
     $buildDir/PLog.Mac.$ver.dmg PLog.Mac/bin/Debug/netcoreapp3.1/PLog.Mac.app
 
+echo -e "\033[1;96m======== Packing Windows version ========\033[0m"
 from=PLog.Win/bin/Release/net461
 to=$buildDir/PLog.Win.$ver
 mkdir $to

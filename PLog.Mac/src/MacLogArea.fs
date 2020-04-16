@@ -13,24 +13,31 @@ type Mode =
       ErrorColor: NSColor
       WarningColor: NSColor
       DebugColor: NSColor
-      InfoColor: NSColor }
+      InfoColor: NSColor
+      SelectionColor: NSColor }
 
 type MacLogArea (isDark) as this =
     inherit Panel ()
+
+    static let convert (x: int) = float x / 255.0
+
+    static let color r g b = NSColor.FromRgba (convert r, convert g, convert b, 1.0)
 
     static let darkMode =
         { BackColor = Color.FromRgb 0x1e1e1e
           ErrorColor = NSColor.SystemRedColor
           WarningColor = NSColor.SystemYellowColor
           DebugColor = NSColor.SystemGreenColor
-          InfoColor = NSColor.FromRgba (0.9, 0.9, 0.9, 1.0) }
+          InfoColor = NSColor.FromRgba (0.9, 0.9, 0.9, 1.0)
+          SelectionColor = color 21 79 142 }
 
     static let lightMode =
-        { BackColor = Colors.WhiteSmoke
-          ErrorColor = NSColor.Red
+        { BackColor = Colors.White
+          ErrorColor = color 186 26 30
           WarningColor = NSColor.Brown
           DebugColor = NSColor.Blue
-          InfoColor = NSColor.Black }
+          InfoColor = NSColor.Black
+          SelectionColor = color 163 215 255 }
 
     let mutable currentMode = if isDark then darkMode else lightMode
 
@@ -43,11 +50,6 @@ type MacLogArea (isDark) as this =
     let textArea = new TextArea (Wrap = false, ReadOnly = true, BackgroundColor = currentMode.BackColor)
 
     let textAreaControl = textArea.ControlObject :?> NSTextView
-
-    do
-        use attrs = new NSMutableDictionary ()
-        attrs.Add (NSAttributedString.BackgroundColorAttributeName, NSColor.SystemBlueColor)
-        textAreaControl.SelectedTextAttributes <- attrs
 
     let label = new Label (Text = "Find text", VerticalAlignment = VerticalAlignment.Center)
     let textBox = new TextBox ()
@@ -104,6 +106,12 @@ type MacLogArea (isDark) as this =
             let startIdx = 0
             findAndSelect textBox.Text startIdx true
 
+    let applyCurrentMode () =
+        textArea.BackgroundColor <- currentMode.BackColor
+        use attrs = new NSMutableDictionary ()
+        attrs.Add (NSAttributedString.BackgroundColorAttributeName, currentMode.SelectionColor)
+        textAreaControl.SelectedTextAttributes <- attrs
+
     do
         nextButton.Click.Add (fun _ -> next ())
         previousButton.Click.Add (fun _ -> prev ())
@@ -132,12 +140,11 @@ type MacLogArea (isDark) as this =
                 keepEnd <- false
         )
 
+        applyCurrentMode ()
 
+    let clear () = textArea.Text <- ""
 
-    member private this._Clear () =
-        textArea.Text <- ""
-
-    member private this._Append (text: string) severity =
+    let append (text: string) severity =
         let color =
             match severity with
             | Domain.Err     -> currentMode.ErrorColor
@@ -151,7 +158,7 @@ type MacLogArea (isDark) as this =
         str.AddAttributes (attrs, NSRange (0L, str.Length))
         textAreaControl.TextStorage.Append (str)
 
-    member private this._AppendLines lines =
+    let appendLines lines =
         let mutable isFirst = true
         let mutable currentSeverity = Domain.Err
         let collectedString = StringBuilder ()
@@ -164,19 +171,19 @@ type MacLogArea (isDark) as this =
             elif severity = currentSeverity then
                 collectedString.AppendLine text |> ignore
             else
-                this._Append (collectedString.ToString()) currentSeverity
+                append (collectedString.ToString()) currentSeverity
                 currentSeverity <- severity
                 collectedString.Clear().AppendLine(text) |> ignore
 
         if collectedString.Length > 0 then
-            this._Append (collectedString.ToString()) currentSeverity
+            append (collectedString.ToString()) currentSeverity
 
         if keepEnd then
             textAreaControl.ScrollRangeToVisible <| NSRange (textAreaControl.TextStorage.Length, 0L)
 
-    member this._ChangeMode mode =
+    let changeMode mode =
         currentMode <- mode
-        textArea.BackgroundColor <- currentMode.BackColor
+        applyCurrentMode ()
 
     interface LogArea with
 
@@ -184,10 +191,10 @@ type MacLogArea (isDark) as this =
             this :> Control
 
         member this.Clear () =
-            this._Clear ()
+            clear ()
 
         member this.AppendLines lines =
-            this._AppendLines lines
+            appendLines lines
 
         member this.GoEnd () =
             keepEnd <- true
@@ -198,6 +205,6 @@ type MacLogArea (isDark) as this =
 
         member this.ChangeMode isDark =
             if isDark && currentMode <> darkMode then
-                this._ChangeMode darkMode
+                changeMode darkMode
             elif not isDark && currentMode <> lightMode then
-                this._ChangeMode lightMode
+                changeMode lightMode

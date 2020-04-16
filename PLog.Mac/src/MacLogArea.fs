@@ -111,22 +111,28 @@ type MacLogArea (isDark) as this =
 
         let mutable enterDown = false
         textBox.KeyDown.Add (fun e -> if e.Key = Keys.Enter then enterDown <- true)
-        textBox.KeyUp.Add (fun e -> if e.Key = Keys.Enter then
-                                        if enterDown then enterDown <- false; rewind ())
+        textBox.KeyUp.Add (fun e ->
+            if e.Key = Keys.Enter && enterDown then
+                enterDown <- false; rewind ()
+        )
 
-        textArea.KeyDown.Add (fun e -> if e.Key = Keys.Enter then
-                                           e.Handled <- true
-                                           next ()
-                                       elif e.Application && e.Key = Keys.G then
-                                           e.Handled <- true
-                                           if e.Shift then prev () else next ()
-                                       elif e.Application && e.Key = Keys.F then
-                                           e.Handled <- true
-                                           textBox.Focus ()
-                                       elif e.Application && e.Key = Keys.Down then
-                                           keepEnd <- true
-                                       elif e.Key = Keys.Up || e.Key = Keys.Down then
-                                           keepEnd <- false)
+        textArea.KeyDown.Add (fun e ->
+            if e.Key = Keys.Enter then
+                e.Handled <- true
+                next ()
+            elif e.Application && e.Key = Keys.G then
+                e.Handled <- true
+                if e.Shift then prev () else next ()
+            elif e.Application && e.Key = Keys.F then
+                e.Handled <- true
+                textBox.Focus ()
+            elif e.Application && e.Key = Keys.Down then
+                keepEnd <- true
+            elif e.Key = Keys.Up || e.Key = Keys.Down then
+                keepEnd <- false
+        )
+
+
 
     member private this._Clear () =
         textArea.Text <- ""

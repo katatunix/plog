@@ -22,11 +22,11 @@ type ScreenshotDialog (adb, device, deviceTitle) as this =
     let showError text =
         MessageBox.Show (text, MessageBoxType.Error) |> ignore
 
-    let mutable bitmap : Bitmap = null
+    let mutable bitmap: Bitmap = null
 
-    let onCaptured (stream : System.IO.Stream) =
+    let onCaptured (stream: System.IO.Stream) =
         try
-            Ok (new Bitmap (stream))
+            Ok <| new Bitmap (stream)
         with _ ->
             Error "Could not capture screenshot for the current device."
 

@@ -5,41 +5,39 @@ open System.Drawing
 open FastColoredTextBoxNS
 open System
 
-type Mode = {
-    BackColor : Color
-    SelColor : Color
-    ErrorStyle : TextStyle
-    WarningStyle : TextStyle
-    DebugStyle : TextStyle
-    InfoStyle : TextStyle
-}
+type Mode =
+    { BackColor: Color
+      SelColor: Color
+      ErrorStyle: TextStyle
+      WarningStyle: TextStyle
+      DebugStyle: TextStyle
+      InfoStyle: TextStyle }
 
 type WinLogArea (isDark) =
 
-    static let darkMode = {
-        BackColor = Color.Black
-        SelColor = Color.FromArgb(150, 255, 255, 255)
-        ErrorStyle = new TextStyle(Brushes.Red, null, FontStyle.Regular)
-        WarningStyle = new TextStyle(Brushes.Yellow, null, FontStyle.Regular)
-        DebugStyle = new TextStyle(Brushes.LightGreen, null, FontStyle.Regular)
-        InfoStyle = new TextStyle(Brushes.White, null, FontStyle.Regular)
-    }
-    static let lightMode = {
-        BackColor = Color.White
-        SelColor = Color.FromArgb(150, 0, 0, 255)
-        ErrorStyle = new TextStyle(Brushes.Red, null, FontStyle.Regular)
-        WarningStyle = new TextStyle(Brushes.Brown, null, FontStyle.Regular)
-        DebugStyle = new TextStyle(Brushes.Blue, null, FontStyle.Regular)
-        InfoStyle = new TextStyle(Brushes.Black, null, FontStyle.Regular)
-    }
+    static let darkMode =
+        { BackColor = Color.Black
+          SelColor = Color.FromArgb(150, 255, 255, 255)
+          ErrorStyle = new TextStyle(Brushes.Red, null, FontStyle.Regular)
+          WarningStyle = new TextStyle(Brushes.Yellow, null, FontStyle.Regular)
+          DebugStyle = new TextStyle(Brushes.LightGreen, null, FontStyle.Regular)
+          InfoStyle = new TextStyle(Brushes.White, null, FontStyle.Regular) }
+
+    static let lightMode =
+        { BackColor = Color.White
+          SelColor = Color.FromArgb(150, 0, 0, 255)
+          ErrorStyle = new TextStyle(Brushes.Red, null, FontStyle.Regular)
+          WarningStyle = new TextStyle(Brushes.Brown, null, FontStyle.Regular)
+          DebugStyle = new TextStyle(Brushes.Blue, null, FontStyle.Regular)
+          InfoStyle = new TextStyle(Brushes.Black, null, FontStyle.Regular) }
 
     let mutable currentMode = if isDark then darkMode else lightMode
 
     let fctb = new FastColoredTextBox (ReadOnly = true, BackColor = currentMode.BackColor, ForeColor = Color.White,
-                                        SelectionColor = currentMode.SelColor,
-                                        Font = new Font("Consolas", 9.75f))
-                                        
-    member private this._AppendLines lines =
+                                       SelectionColor = currentMode.SelColor,
+                                       Font = new Font ("Consolas", 9.75f))
+
+    let appendLines lines =
         fctb.BeginUpdate ()
         fctb.Selection.BeginUpdate ()
 
@@ -66,7 +64,7 @@ type WinLogArea (isDark) =
         fctb.Selection.EndUpdate ()
         fctb.EndUpdate ()
 
-    member private this._ChangeMode mode =
+    let changeMode mode =
         currentMode <- mode
         fctb.BackColor <- currentMode.BackColor
         fctb.SelectionColor <- currentMode.SelColor
@@ -86,10 +84,10 @@ type WinLogArea (isDark) =
             fctb.WordWrap <- value
 
         member this.AppendLines lines =
-            this._AppendLines lines
+            appendLines lines
 
         member this.ChangeMode isDark =
             if isDark && currentMode <> darkMode then
-                this._ChangeMode darkMode
+                changeMode darkMode
             elif not isDark && currentMode <> lightMode then
-                this._ChangeMode lightMode
+                changeMode lightMode

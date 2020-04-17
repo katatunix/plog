@@ -6,17 +6,19 @@ open Eto.Drawing
 open EtoUtils
 open Domain
 
-type ConfigDialog (adb, negative : seq<FilterInfo>, callback) as this =
-    inherit Dialog (Title = "Config", Size = Size (500, 300))
+type ConfigDialog (adb, maxLogLines, negative: seq<FilterInfo>, callback) as this =
+    inherit Dialog (Title = "Config", Size = Size (500, 350))
     
     let adbTextBox = new TextBox (Text = adb)
     let browseAdbButton = new Button (Text = "Browse")
+    let maxLogStepper = new NumericStepper (MinValue = 1000.0, MaxValue = 1000000.0, Value = float maxLogLines)
     let negativeTextArea = new TextArea (Font = codeFont)
     let okButton = new Button (Text = "OK")
     let cancelButton = new Button (Text = "Cancel")
 
     let SPACE = Spacing (Size (8, 8))
     let PAD = Pad (Padding 8)
+
     do this.Content <-
         mkLayout <| Tbl [
             PAD; SPACE
@@ -24,6 +26,8 @@ type ConfigDialog (adb, negative : seq<FilterInfo>, callback) as this =
             Row [TableEl <| Tbl [SPACE
                                  Row [StretchedEl adbTextBox; El browseAdbButton]
                                  ]]
+            Row [El (new Label (Text = "Max log lines"))]
+            Row [El maxLogStepper]
             Row [El (new Label (Text = "Negative filters – log matched any of these will be totally ignored"))]
             StretchedRow [El negativeTextArea]
             Row [TableEl <| Tbl [SPACE
@@ -42,6 +46,7 @@ type ConfigDialog (adb, negative : seq<FilterInfo>, callback) as this =
                 | None, None         -> failwith "Should not go here"
             )
             |> String.concat Environment.NewLine
+
         negativeTextArea.Text <-
             if str.Length > 0 then str
             else [ "//Syntax: Tag, PID"
@@ -49,6 +54,7 @@ type ConfigDialog (adb, negative : seq<FilterInfo>, callback) as this =
                    "//JustDummyTag"
                    "//, 1234" ]
                  |> String.concat Environment.NewLine
+
         if System.isWindows then
             negativeTextArea.KeyDown.Add (fun e ->
                 if e.Control && e.Key = Keys.V then
@@ -65,10 +71,11 @@ type ConfigDialog (adb, negative : seq<FilterInfo>, callback) as this =
         if openFileDialog.ShowDialog (this) = DialogResult.Ok then
             adbTextBox.Text <- openFileDialog.FileName
     )
-    
+
     do okButton.Click.Add (fun _ ->
         this.Close ()
         let adb = adbTextBox.Text
+        let maxLogLines = maxLogStepper.Value |> int
         let negative =
             negativeTextArea.Text
             |> System.splitLines
@@ -89,7 +96,7 @@ type ConfigDialog (adb, negative : seq<FilterInfo>, callback) as this =
                     if tag = None && pid = None then None
                     else Some { Tag = tag; Pid = pid }
             )
-        callback adb negative
+        callback adb maxLogLines negative
     )
 
     do cancelButton.Click.Add (fun _ -> this.Close ())

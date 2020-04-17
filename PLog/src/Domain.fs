@@ -7,48 +7,44 @@ open System.Collections.Generic
 open System.Threading
 open Process
 
-type Device = {
-    Model : string option
-    Serial : string
-}
+type Device =
+    { Model: string option
+      Serial: string }
 
 type Severity = Info | Debug | Warning | Err
 
-type LogItem = {
-    Content : string
-    Severity : Severity
-    Tag : string option
-    Pid : int option
-}
+type LogItem =
+    { Content: string
+      Severity: Severity
+      Tag: string option
+      Pid: int option }
 
-type FilterInfo = {
-    Tag : string option
-    Pid : int option
-}
+type FilterInfo =
+    { Tag: string option
+      Pid: int option }
 
-type Filter = {
-    Name : string
-    Info : FilterInfo
-}
+type Filter =
+    { Name: string
+      Info: FilterInfo }
 
-type Config = {
-    Adb : string
-    DsymFile : string
-    Filters : Filter list
-    Negative : FilterInfo []
-    IsDark : bool
-}
+type Config =
+    { Adb: string
+      DsymFile: string
+      Filters: Filter list
+      Negative: FilterInfo []
+      IsDark: bool
+      MaxLogLines: int }
 
-type LogSource =
+type CrashLogSource =
     | Live of seq<string>
     | File of string
 
-let private parseDeviceSerial (line : string) =
+let private parseDeviceSerial (line: string) =
     let i = line.IndexOf "\t"
     if i = -1 then None
     else Some <| line.Substring(0, i).Trim()
 
-let private parseDeviceModel (line : string) =
+let private parseDeviceModel (line: string) =
     if line.StartsWith "[ro.product.model]" then
         let i = line.IndexOf ":"
         if i = -1 then None
@@ -57,8 +53,7 @@ let private parseDeviceModel (line : string) =
         None
 
 let fetchDevices adb = result {
-    let! lines = Process.run adb "devices"
-                             { ShowWindow = true; RedirectStdErr = false }
+    let! lines = Process.run adb "devices" { ShowWindow = true; RedirectStdErr = false }
     return
         lines
         |> Seq.choose parseDeviceSerial
@@ -73,7 +68,7 @@ let fetchDevices adb = result {
         |> Array.ofSeq
 }
 
-let private parseLogItem1 (str : string) =
+let private parseLogItem1 (str: string) =
     let severity =
         if str.StartsWith "E/" then Err
         elif str.StartsWith "W/" then Warning
@@ -89,14 +84,12 @@ let private parseLogItem1 (str : string) =
             let k = str.IndexOf (')', j)
             if k > -1 then
                 pid <- str.Substring(j + 1, k - j - 1) |> parseInt
-    {
-        Content = str
-        Severity = severity
-        Tag = tag
-        Pid = pid
-    }
+    { Content = str
+      Severity = severity
+      Tag = tag
+      Pid = pid }
 
-let private parseLogItem2 (str : string) =
+let private parseLogItem2 (str: string) =
     let mutable severity = Info
     let mutable tag = None
     let mutable pid = None
@@ -113,12 +106,10 @@ let private parseLogItem2 (str : string) =
                             | _ -> Info
             if p.Length >= 6 then
                 tag <- Some p.[5]
-    {
-        Content = str
-        Severity = severity
-        Tag = tag
-        Pid = pid
-    }
+    { Content = str
+      Severity = severity
+      Tag = tag
+      Pid = pid }
 
 let parseLogItem (str : string) =
     if str.Length < 2 || str.[1] = '/' then
@@ -128,7 +119,7 @@ let parseLogItem (str : string) =
         
 let mainFilter = { Name = "MAIN"; Info = { Tag = None; Pid = None } }
 
-let connectDevice adb device onItemsReceived onExited (key : 'key) =
+let connectDevice adb device onItemsReceived onExited (key: 'key) =
     let args =
         match device with
         | None -> "logcat"
@@ -136,7 +127,7 @@ let connectDevice adb device onItemsReceived onExited (key : 'key) =
 
     let cache = List ()
 
-    let addToCache (line : string) =
+    let addToCache (line: string) =
         if line.Length > 0 then
             lock cache (fun _ -> cache.Add line)
 
@@ -174,18 +165,18 @@ let logcatClear adb device =
         (mre1.Set >> ignore)
 
     |> Result.bind (fun action ->
-        let handles : WaitHandle [] = [| mre0; mre1 |]
+        let handles: WaitHandle [] = [| mre0; mre1 |]
         let idx = WaitHandle.WaitAny (handles, 2000)
 
         if idx <> 1 then
             action.Kill ()
-            Error <| "Could not clear log for the current device. " +
-                     "Make sure the device is available and its log is not being consumed by any adb client (even PLog)."
+            Error <| "Could not clear log for the current device. \
+                      Make sure the device is available and its log is not being consumed by any adb client (even PLog)."
         else
             Ok ()
     )
 
-let matchesFilter (info : FilterInfo) (logItem : LogItem) =
+let matchesFilter (info: FilterInfo) (logItem: LogItem) =
     let tagOk =
         match info.Tag with
         | None -> true
@@ -196,25 +187,24 @@ let matchesFilter (info : FilterInfo) (logItem : LogItem) =
         | _ -> logItem.Pid = info.Pid
     tagOk && pidOk
 
-let private toOption (str : string) =
+let private toOption (str: string) =
     let str = str.Trim ()
     if str.Length = 0 then None else Some str
 
-let createFilter (name : string) (tag : string) (pid : string) =
-    result {
-        let! name = name |> toOption |> Result.ofOption "Filter name cannot be empty."
-        let tag = tag |> toOption
-        let pid = pid |> toOption
-        match tag, pid with
-        | None, None ->
-            return! Error "At least Tag or PID must be provided."
-        | _, None ->
-            return { Name = name; Info = { Tag = tag; Pid = None } }
-        | _, Some pid ->
-            let! pid = pid |> parseInt |> Result.ofOption "PID must be an integer number."
-            return { Name = name; Info = { Tag = tag; Pid = Some pid } }
-    }
-    
+let createFilter (name: string) (tag: string) (pid: string) = result {
+    let! name = name |> toOption |> Result.ofOption "Filter name cannot be empty."
+    let tag = tag |> toOption
+    let pid = pid |> toOption
+    match tag, pid with
+    | None, None ->
+        return! Error "At least Tag or PID must be provided."
+    | _, None ->
+        return { Name = name; Info = { Tag = tag; Pid = None } }
+    | _, Some pid ->
+        let! pid = pid |> parseInt |> Result.ofOption "PID must be an integer number."
+        return { Name = name; Info = { Tag = tag; Pid = Some pid } }
+}
+
 let private (+/) p1 p2 = Path.Combine (p1, p2)
 
 let private addr2line =
@@ -238,15 +228,18 @@ let private getStacktraceFromLive dsymFile lines =
         Process.runFull addr2line (sprintf "-pCafe \"%s\" %s" dsymFile addresses)
         <| { ShowWindow = false; RedirectStdErr = false }
 
-let private getStacktraceFromFile dsymFile logFile =
+let readLogFile path =
     try
         let tenMB_in_bytes = 10485760L
-        if IO.FileInfo(logFile).Length <= tenMB_in_bytes then
-            IO.File.ReadAllLines logFile |> Ok
+        if IO.FileInfo(path).Length <= tenMB_in_bytes then
+            IO.File.ReadAllLines path |> Ok
         else
             Error "Log file size cannot be bigger than 10 MB."
     with ex ->
         Error ex.Message
+
+let private getStacktraceFromFile dsymFile logFile =
+    readLogFile logFile
     |> Result.bind (getStacktraceFromLive dsymFile)
 
 let getStacktrace dsymFile source =
@@ -260,22 +253,27 @@ let captureScreenshot adb device =
         | None -> ""
         | Some dev -> sprintf "-s %s " dev.Serial
     Process.getOutputStream adb (sprintf "%sexec-out screencap -p" devicePrefix)
-
+    
 let private dataFolder = (Environment.GetFolderPath Environment.SpecialFolder.UserProfile) +/ ".plog"
 let private configFile = dataFolder +/ "config.dat"
 
-let saveConfig (config : Config) =
+let saveConfig (config: Config) =
     Directory.CreateDirectory dataFolder |> ignore
     IO.writeValueToFile config configFile
 
-let loadConfig () : Config =
-    try IO.readValueFromFile configFile
+let loadConfig () =
+    let defaultMaxLogLines = 40000
+    try
+        let config = IO.readValueFromFile configFile
+        if config.MaxLogLines = 0
+        then { config with MaxLogLines = defaultMaxLogLines }
+        else config
     with _ ->
-        let defaultConfig =  {
-            Adb = "adb"
-            DsymFile = ""
-            Filters = []
-            Negative = [||]
-            IsDark = true
-        }
+        let defaultConfig = { Adb = "adb"
+                              DsymFile = ""
+                              Filters = []
+                              Negative = [||]
+                              IsDark = true
+                              MaxLogLines = defaultMaxLogLines }
         defaultConfig
+        

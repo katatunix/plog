@@ -6,7 +6,7 @@ open Eto.Drawing
 open EtoUtils
 
 type MainForm (mkLogArea : bool -> LogArea) as this =
-    inherit Form (Title = "PLog 9.5 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
+    inherit Form (Title = "PLog 9.6 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
 
     let pre = MainPresenter (this, Application.Instance.Invoke)
 
@@ -38,7 +38,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
 
     let modeCheckBox = new CheckBox (Text = "Dark mode")
     let clearButton = new Button (Text = "Clear", ToolTip = "Clear log in all filters")
-    let deepClearButton = new Button (Text = "Clear in device", ToolTip = "Clear log in all filters and in device")
+    let clearInDeviceButton = new Button (Text = "Clear in device", ToolTip = "Clear log in all filters and in device")
     let wrapCheckBox = new CheckBox (Text = "Wrap")
     let goEndButton = new Button (Text = "Go end")
     let exportButton = new Button (Text = "Export")
@@ -75,7 +75,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
             Row [TableEl (Tbl [SPACE
                                Row [El modeCheckBox
                                     El clearButton
-                                    El deepClearButton
+                                    El clearInDeviceButton
                                     El wrapCheckBox
                                     El goEndButton
                                     El exportButton
@@ -102,7 +102,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
 
         modeCheckBox.CheckedChanged.Add (fun _ -> pre.ChangeMode modeCheckBox.Checked.Value)
         clearButton.Click.Add (fun _ -> pre.Clear ())
-        deepClearButton.Click.Add (fun _ -> pre.DeepClear deviceListDropDown.SelectedIndex)
+        clearInDeviceButton.Click.Add (fun _ -> pre.ClearInDevice deviceListDropDown.SelectedIndex)
         goEndButton.Click.Add (fun _ -> pre.GoEnd ())
 
         exportButton.Click.Add (fun _ ->
@@ -178,8 +178,8 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
         member this.OpenStacktrace dsymFile logSource =
             (new StacktraceDialog (dsymFile, logSource)).ShowModal ()
 
-        member this.OpenConfig adb negative =
-            (new ConfigDialog (adb, negative, pre.UpdateConfig)).ShowModal ()
+        member this.OpenConfig adb maxLogLines negative =
+            (new ConfigDialog (adb, maxLogLines, negative, pre.UpdateConfig)).ShowModal ()
 
         member this.OpenScreenshot adb device deviceTitle =
             (new ScreenshotDialog (adb, device, deviceTitle)).ShowModal ()

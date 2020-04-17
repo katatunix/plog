@@ -5,7 +5,7 @@ open System.Threading
 
 let isWindows = Environment.OSVersion.Platform <> PlatformID.Unix
 
-let splitLines (str : string) =
+let splitLines (str: string) =
     str.Replace("\r\n", "\n").Split([|"\n"|], StringSplitOptions.RemoveEmptyEntries)
 
 let startThread f =

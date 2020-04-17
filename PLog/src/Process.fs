@@ -4,15 +4,13 @@ open System
 open System.Text
 open System.Collections.Generic
 
-type StartInfo = {
-    ShowWindow : bool
-    RedirectStdErr : bool
-}
+type StartInfo =
+    { ShowWindow: bool
+      RedirectStdErr: bool }
 
-type Action = {
-    Kill : unit -> unit
-    Wait : unit -> unit
-}
+type Action =
+    { Kill: unit -> unit
+      Wait: unit -> unit }
 
 let mkProcess program args info =
     let p = new Diagnostics.Process ()
@@ -28,7 +26,7 @@ let mkProcess program args info =
     if info.RedirectStdErr then p.StartInfo.StandardErrorEncoding <- System.Text.Encoding.UTF8
     p
 
-let private startProcess (p : Diagnostics.Process) =
+let private startProcess (p: Diagnostics.Process) =
     if p.Start () |> not then raise <| Exception ()
 
 let private error program = Error <| sprintf "Could not start %s" program

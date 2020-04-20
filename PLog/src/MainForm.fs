@@ -6,7 +6,7 @@ open Eto.Drawing
 open EtoUtils
 
 type MainForm (mkLogArea : bool -> LogArea) as this =
-    inherit Form (Title = "PLog 9.6 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
+    inherit Form (Title = "PLog 9.7 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
 
     let pre = MainPresenter (this, Application.Instance.Invoke)
 
@@ -56,7 +56,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
     )
 
     let getStacktraceFromFileButton = new Button (Text = "From log file", ToolTip = "Get stacktrace from external log file")
-    let openLogFileDialog = new OpenFileDialog (Title = "Select log file", MultiSelect = false)
+    let openLogFileDialog = new OpenFileDialog (Title = "Select log file to get stacktrace", MultiSelect = false)
 
     let exportFileDialog = new SaveFileDialog (Title = "Export log to text file")
     do exportFileDialog.Filters.Add (new FileFilter ("Text", [|".txt"|]))

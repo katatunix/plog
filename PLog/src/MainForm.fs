@@ -45,7 +45,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
     let importButton = new Button (Text = "Import")
 
     let dsymLabel = new Label (Text = "Dsym file", VerticalAlignment = VerticalAlignment.Center)
-    let dsymTextBox = new TextBox (PlaceholderText = "Type/paste/browse the path to your dsym file here")
+    let dsymTextBox = new TextBox (PlaceholderText = "Path to your dsym file")
     let browseDsymButton = new Button (Text = "Browse", ToolTip = "Browse dsym file")
     let getStacktraceButton = new Button (Text = "Get stacktrace", ToolTip = "Get stacktrace from live log")
 

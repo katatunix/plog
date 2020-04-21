@@ -52,7 +52,7 @@ type MacLogArea (isDark) as this =
     let textAreaControl = textArea.ControlObject :?> NSTextView
 
     let label = new Label (Text = "Find text", VerticalAlignment = VerticalAlignment.Center)
-    let textBox = new TextBox ()
+    let findTextBox = new SearchBox (PlaceholderText = "Type the text you want to find")
     let previousButton = new Button (Text = "◀︎", MinimumSize = Size (40, -1))
     let nextButton = new Button (Text = "▶︎", MinimumSize = Size (40, -1))
     let rewindButton = new Button (Text = "Rewind")
@@ -63,7 +63,7 @@ type MacLogArea (isDark) as this =
             Row [TableEl <| Tbl [SPACE
                                  Pad (Padding (DIST, 0, 0, 0))
                                  Row [El label
-                                      StretchedEl textBox
+                                      StretchedEl findTextBox
                                       El previousButton
                                       El nextButton
                                       El rewindButton
@@ -90,21 +90,21 @@ type MacLogArea (isDark) as this =
             textArea.Focus()
 
     let next () =
-        if textBox.Text.Length > 0 then
+        if findTextBox.Text.Length > 0 then
             let selection = textArea.Selection
             let startIdx = if selection.Length () > 0 then selection.Start + 1 else textArea.CaretIndex
-            findAndSelect textBox.Text startIdx true
+            findAndSelect findTextBox.Text startIdx true
 
     let prev () =
-        if textBox.Text.Length > 0 then
+        if findTextBox.Text.Length > 0 then
             let selection = textArea.Selection
             let startIdx = if selection.Length () > 0 then selection.End - 1 else textArea.CaretIndex
-            findAndSelect textBox.Text startIdx false
+            findAndSelect findTextBox.Text startIdx false
 
     let rewind () =
-        if textBox.Text.Length > 0 then
+        if findTextBox.Text.Length > 0 then
             let startIdx = 0
-            findAndSelect textBox.Text startIdx true
+            findAndSelect findTextBox.Text startIdx true
 
     let applyCurrentMode () =
         textArea.BackgroundColor <- currentMode.BackColor
@@ -118,8 +118,8 @@ type MacLogArea (isDark) as this =
         rewindButton.Click.Add (fun _ -> rewind ())
 
         let mutable enterDown = false
-        textBox.KeyDown.Add (fun e -> if e.Key = Keys.Enter then enterDown <- true)
-        textBox.KeyUp.Add (fun e ->
+        findTextBox.KeyDown.Add (fun e -> if e.Key = Keys.Enter then enterDown <- true)
+        findTextBox.KeyUp.Add (fun e ->
             if e.Key = Keys.Enter && enterDown then
                 enterDown <- false; rewind ()
         )
@@ -133,7 +133,7 @@ type MacLogArea (isDark) as this =
                 if e.Shift then prev () else next ()
             elif e.Application && e.Key = Keys.F then
                 e.Handled <- true
-                textBox.Focus ()
+                findTextBox.Focus ()
             elif e.Application && e.Key = Keys.Down then
                 keepEnd <- true
             elif e.Key = Keys.Up || e.Key = Keys.Down then

@@ -20,6 +20,6 @@
     <Compile Include="src\AddFilterDialog.fs" />
     <Compile Include="src\MainPresenter.fs" />
     <Compile Include="src\MainForm.fs" />
-    <PackageReference Include="Eto.Forms" Version="2.5.0" />
+    <PackageReference Include="Eto.Forms" Version="2.5.7" />
   </ItemGroup>
 </Project>

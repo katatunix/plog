@@ -59,8 +59,10 @@ let fetchDevices adb = result {
         |> Seq.choose parseDeviceSerial
         |> Seq.map (fun serial ->
             let model =
-                Process.run adb (sprintf "-s %s shell getprop" serial)
-                            { ShowWindow = false; RedirectStdErr = false }
+                Process.run
+                    adb
+                    (sprintf "-s %s shell getprop" serial)
+                    { ShowWindow = false; RedirectStdErr = false }
                 |> Result.toOption
                 |> Option.bind (Seq.tryPick parseDeviceModel)
             { Model = model; Serial = serial }
@@ -170,8 +172,8 @@ let logcatClear adb device =
 
         if idx <> 1 then
             action.Kill ()
-            Error <| "Could not clear log for the current device. \
-                      Make sure the device is available and its log is not being consumed by any adb client (even PLog)."
+            Error "Could not clear log for the current device. \
+                   Make sure the device is available and its log is not being consumed by any adb client (even PLog)."
         else
             Ok ()
     )

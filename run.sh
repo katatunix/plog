@@ -1,1 +1,1 @@
-./PLog.Mac/bin/Debug/netcoreapp3.1/PLog.Mac.app/Contents/MacOS/PLog.Mac
+./PLog.Mac/bin/Release/net6.0/PLog.Mac.app/Contents/MacOS/PLog.Mac

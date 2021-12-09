@@ -6,7 +6,7 @@ open Eto.Drawing
 open EtoUtils
 
 type MainForm (mkLogArea : bool -> LogArea) as this =
-    inherit Form (Title = "PLog 9.8 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
+    inherit Form (Title = "PLog 9.9 | nghia.buivan@hotmail.com", Size = Size (1200, 800))
 
     let pre = MainPresenter (this, Application.Instance.Invoke)
 
@@ -51,7 +51,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
 
     let openDsymDialog = new OpenFileDialog (Title = "Select dsym file", MultiSelect = false)
     do browseDsymButton.Click.Add (fun _ ->
-        if openDsymDialog.ShowDialog (this) = DialogResult.Ok then
+        if openDsymDialog.ShowDialog this = DialogResult.Ok then
             dsymTextBox.Text <- openDsymDialog.FileName
     )
 
@@ -59,11 +59,11 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
     let openLogFileDialog = new OpenFileDialog (Title = "Select log file to get stacktrace", MultiSelect = false)
 
     let exportFileDialog = new SaveFileDialog (Title = "Export log to text file")
-    do exportFileDialog.Filters.Add (new FileFilter ("Text", [|".txt"|]))
+    do exportFileDialog.Filters.Add (FileFilter ("Text", [|".txt"|]))
 
     let importFileDialog = new OpenFileDialog (Title = "Import log from text file", MultiSelect = false)
-    
-    do this.Content <- 
+
+    do this.Content <-
         mkLayout <| Tbl [
             PAD
             SPACE
@@ -71,7 +71,9 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
                                Row [El refreshButton; StretchedEl deviceListDropDown
                                     El connectButton; El screenshotButton; El configButton
                                     ]])]
-            StretchedRow [El (new Splitter (Panel1 = filterPanel, Panel2 = logPanel, Panel1MinimumSize = 150, Panel2MinimumSize = 300))]
+            StretchedRow [
+                El (new Splitter (Panel1 = filterPanel, Panel2 = logPanel, Panel1MinimumSize = 150, Panel2MinimumSize = 300))
+            ]
             Row [TableEl (Tbl [SPACE
                                Row [El modeCheckBox
                                     El clearButton
@@ -106,12 +108,12 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
         goEndButton.Click.Add (fun _ -> pre.GoEnd ())
 
         exportButton.Click.Add (fun _ ->
-            if exportFileDialog.ShowDialog (this) = DialogResult.Ok then
+            if exportFileDialog.ShowDialog this = DialogResult.Ok then
                 pre.Export exportFileDialog.FileName
         )
 
         importButton.Click.Add (fun _ ->
-            if importFileDialog.ShowDialog (this) = DialogResult.Ok then
+            if importFileDialog.ShowDialog this = DialogResult.Ok then
                 pre.Import importFileDialog.FileName
         )
 
@@ -119,7 +121,7 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
 
         getStacktraceButton.Click.Add (fun _ -> pre.GetStacktrace dsymTextBox.Text LiveLog)
         getStacktraceFromFileButton.Click.Add (fun _ ->
-            if openLogFileDialog.ShowDialog (this) = DialogResult.Ok then
+            if openLogFileDialog.ShowDialog this = DialogResult.Ok then
                 pre.GetStacktrace dsymTextBox.Text (LogFile openLogFileDialog.FileName)
         )
 

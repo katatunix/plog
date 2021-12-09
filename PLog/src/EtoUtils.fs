@@ -23,13 +23,13 @@ let rec mkLayout (Tbl t) =
     let ret = new TableLayout ()
     for r in t  do
         let makeTd (tds : TCell list) =
-            let row = new TableRow ()
+            let row = TableRow()
             for td in tds do
                 match td with
-                | El c -> row.Cells.Add (new TableCell (c, false))
-                | StretchedEl c -> row.Cells.Add (new TableCell (c, true))
-                | EmptyElement -> row.Cells.Add (new TableCell (null, true))
-                | TableEl t -> row.Cells.Add (new TableCell (mkLayout t, true))
+                | El c -> row.Cells.Add (TableCell(c, false))
+                | StretchedEl c -> row.Cells.Add (TableCell(c, true))
+                | EmptyElement -> row.Cells.Add (TableCell(null, true))
+                | TableEl t -> row.Cells.Add (TableCell(mkLayout t, true))
             row
         match r with
         | Row tds -> let r = makeTd tds in ret.Rows.Add r

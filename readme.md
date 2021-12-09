@@ -2,8 +2,8 @@ PLog &ndash; a tool for viewing Android log and more
 ===
 
 ## Setup
-* Visual Studio 2019 with F# support.
-* .NET Core SDK 3.1.
+* Visual Studio or Rider with F# support.
+* .NET Core SDK 6.0.
 
 ## Build
 * Open `PLog.sln` with your Visual Studio.

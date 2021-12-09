@@ -1,19 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
-    <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
-    <DebugSymbols>false</DebugSymbols>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE;RELEASE;NETCOREAPP;NETCOREAPP3_1</DefineConstants>
-    <GenerateTailCalls>true</GenerateTailCalls>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="src\MacLogArea.fs" />
-    <Compile Include="src\Program.fs" />
-    <Content Include="Icon.icns" />
-    <Content Include="addr2line" />
-    <ProjectReference Include="..\PLog\PLog.fsproj" />
-    <PackageReference Include="Eto.Platform.Mac64" Version="2.5.7" />
-  </ItemGroup>
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="src\MacLogArea.fs"/>
+        <Compile Include="src\Program.fs"/>
+        <Content Include="Icon.icns"/>
+        <Content Include="addr2line"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\PLog\PLog.fsproj"/>
+        <PackageReference Include="Eto.Platform.Mac64" Version="2.6.0"/>
+    </ItemGroup>
+
 </Project>

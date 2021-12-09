@@ -2,7 +2,7 @@
 
 open System.Collections.Generic
 open Domain
-    
+
 type MainView =
     abstract ShowError : string -> unit
     abstract UpdateDevices : string [] -> unit
@@ -83,7 +83,7 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
         isDark <- config.IsDark
         maxLogLines <- config.MaxLogLines
 
-        logPages.Add (LogPage (mainFilter))
+        logPages.Add (LogPage mainFilter)
         for filter in config.Filters do
             logPages.Add (LogPage filter)
 
@@ -145,22 +145,25 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
     member private this.AddLogItems items =
         let isNegative item = negative |> Array.exists (fun info -> Domain.matchesFilter info item)
 
-        let matchedItemss =
+        let matchedItems =
             logPages
-            |> Seq.mapi (fun i page ->
+            |> Seq.mapi (fun _ page ->
                 items
                 |> Seq.filter (fun item -> item |> isNegative |> not && item |> Domain.matchesFilter page.Filter.Info)
                 |> Array.ofSeq
             )
             |> List.ofSeq
 
-        let numLines = logPages.[0].LogItems.Count + matchedItemss.[0].Length
+        let numLines = logPages.[0].LogItems.Count + matchedItems.[0].Length
         if numLines > maxLogLines then
             disconnect ()
-            view.ShowError <| sprintf "Stopped due to too much log (%d lines). It is recommented to clear log in the device before continuing."
-                                      numLines
+            sprintf
+                "Stopped due to too much log (%d lines). \
+                 It is recommended to clear log in the device before continuing."
+                numLines
+            |> view.ShowError
         else
-            (logPages, matchedItemss)
+            (logPages, matchedItems)
             ||> Seq.iteri2 (fun i page matchedItems ->
                 page.LogItems.AddRange matchedItems
                 if i <> curPageIdx then

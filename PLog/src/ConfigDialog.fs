@@ -8,7 +8,7 @@ open Domain
 
 type ConfigDialog (adb, maxLogLines, negative: seq<FilterInfo>, callback) as this =
     inherit Dialog (Title = "Config", Size = Size (500, 350))
-    
+
     let adbTextBox = new TextBox (Text = adb)
     let browseAdbButton = new Button (Text = "Browse")
     let maxLogStepper = new NumericStepper (MinValue = 1000.0, MaxValue = 1000000.0, Value = float maxLogLines)
@@ -68,7 +68,7 @@ type ConfigDialog (adb, maxLogLines, negative: seq<FilterInfo>, callback) as thi
 
     let openFileDialog = new OpenFileDialog (Title = "Select adb file", MultiSelect = false)
     do browseAdbButton.Click.Add (fun _ ->
-        if openFileDialog.ShowDialog (this) = DialogResult.Ok then
+        if openFileDialog.ShowDialog this = DialogResult.Ok then
             adbTextBox.Text <- openFileDialog.FileName
     )
 

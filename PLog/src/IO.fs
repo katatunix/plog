@@ -1,22 +1,12 @@
 ﻿module IO
 
 open System.IO
-open System.Runtime.Serialization.Formatters.Binary
+open FSharp.Json
 
-let private writeValue stream x =
-    let formatter = BinaryFormatter ()
-    formatter.Serialize (stream, box x)
+let writeValueToFile value (path: string) =
+    use stream = new StreamWriter (path)
+    Json.serialize value |> stream.Write
 
-let private readValue stream =
-    let formatter = BinaryFormatter ()
-    let res = formatter.Deserialize stream
-    unbox res
-
-let writeValueToFile x path =
-    use stream = new FileStream (path, FileMode.Create)
-    writeValue stream x
-
-let readValueFromFile path =
-    use stream = new FileStream (path, FileMode.Open)
-    readValue stream
-    
+let readValueFromFile (path: string) =
+    use stream = new StreamReader (path)
+    stream.ReadToEnd () |> Json.deserialize

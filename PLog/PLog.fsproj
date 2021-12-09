@@ -1,25 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <DebugSymbols>false</DebugSymbols>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE;RELEASE;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
-    <GenerateTailCalls>true</GenerateTailCalls>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="src\Result.fs" />
-    <Compile Include="src\System.fs" />
-    <Compile Include="src\IO.fs" />
-    <Compile Include="src\Process.fs" />
-    <Compile Include="src\Domain.fs" />
-    <Compile Include="src\EtoUtils.fs" />
-    <Compile Include="src\LogArea.fs" />
-    <Compile Include="src\ScreenshotDialog.fs" />
-    <Compile Include="src\ConfigDialog.fs" />
-    <Compile Include="src\StacktraceDialog.fs" />
-    <Compile Include="src\AddFilterDialog.fs" />
-    <Compile Include="src\MainPresenter.fs" />
-    <Compile Include="src\MainForm.fs" />
-    <PackageReference Include="Eto.Forms" Version="2.5.7" />
-  </ItemGroup>
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="src\Result.fs" />
+        <Compile Include="src\System.fs" />
+        <Compile Include="src\IO.fs" />
+        <Compile Include="src\Process.fs" />
+        <Compile Include="src\Domain.fs" />
+        <Compile Include="src\EtoUtils.fs" />
+        <Compile Include="src\LogArea.fs" />
+        <Compile Include="src\ScreenshotDialog.fs" />
+        <Compile Include="src\ConfigDialog.fs" />
+        <Compile Include="src\StacktraceDialog.fs" />
+        <Compile Include="src\AddFilterDialog.fs" />
+        <Compile Include="src\MainPresenter.fs" />
+        <Compile Include="src\MainForm.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Eto.Forms" Version="2.6.0" />
+      <PackageReference Include="FSharp.Json" Version="0.4.1" />
+    </ItemGroup>
+
 </Project>

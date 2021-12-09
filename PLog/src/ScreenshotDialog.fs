@@ -17,7 +17,7 @@ type ScreenshotDialog (adb, device, deviceTitle) as this =
     let closeButton = new Button (Text = "Close")
 
     let saveFileDialog = new SaveFileDialog (Title = "Save screenshot")
-    do saveFileDialog.Filters.Add (new FileFilter ("Portable Network Graphics", [|".png"|]))
+    do saveFileDialog.Filters.Add (FileFilter ("Portable Network Graphics", [|".png"|]))
 
     let showError text =
         MessageBox.Show (text, MessageBoxType.Error) |> ignore
@@ -75,7 +75,7 @@ type ScreenshotDialog (adb, device, deviceTitle) as this =
         saveButton.Click.Add (fun _ ->
             if isNull bitmap then
                 showError "Nothing to save"
-            elif saveFileDialog.ShowDialog (this) = DialogResult.Ok then
+            elif saveFileDialog.ShowDialog this = DialogResult.Ok then
                 try
                     bitmap.Save (saveFileDialog.FileName, ImageFormat.Png)
                 with ex ->

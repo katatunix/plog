@@ -156,18 +156,18 @@ type MacLogArea (isDark) as this =
         attrs.Add (NSAttributedString.ForegroundColorAttributeName, color)
         attrs.Add (NSAttributedString.FontAttributeName, font)
         str.AddAttributes (attrs, NSRange (0L, str.Length))
-        textAreaControl.TextStorage.Append (str)
+        textAreaControl.TextStorage.Append str
 
     let appendLines lines =
         let mutable isFirst = true
         let mutable currentSeverity = Domain.Err
         let collectedString = StringBuilder ()
 
-        for (text, severity) in lines do
+        for text, severity in lines do
             if isFirst then
                 isFirst <- false
                 currentSeverity <- severity
-                collectedString.AppendLine text |> ignore
+                collectedString.AppendLine (text: string) |> ignore
             elif severity = currentSeverity then
                 collectedString.AppendLine text |> ignore
             else

@@ -13,7 +13,7 @@ PLog &ndash; a tool for viewing Android log and more
     * Alternatively, you can run `build.mac.sh`.
 * To build Windows version:
     * Must be built on Windows.
-    * .NET Framework 4.6.1 is required.
+    * .NET Framework 4.6.2 is required.
     * Build the project `PLog.Win`.
     * Alternatively, you can run `build.win.bat`.
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net462</TargetFrameworks>
     <Win32Resource>AppIcon.res</Win32Resource>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -15,7 +15,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <ProjectReference Include="..\PLog\PLog.fsproj" />
-    <PackageReference Include="Eto.Platform.Windows" Version="2.5.0" />
+    <PackageReference Include="Eto.Platform.Windows" Version="2.6.0" />
     <PackageReference Include="FCTB" Version="2.16.24" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Drawing" />

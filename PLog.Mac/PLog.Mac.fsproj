@@ -7,15 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="src\MacLogArea.fs"/>
-        <Compile Include="src\Program.fs"/>
-        <Content Include="Icon.icns"/>
-        <Content Include="addr2line"/>
+        <Compile Include="src\MacLogArea.fs" />
+        <Compile Include="src\Program.fs" />
+        <Content Include="Icon.icns" />
+        <Content Include="addr2line" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\PLog\PLog.fsproj"/>
-        <PackageReference Include="Eto.Platform.Mac64" Version="2.6.0"/>
+        <ProjectReference Include="..\PLog\PLog.fsproj" />
+        <PackageReference Include="Eto.Platform.Mac64" Version="2.7.0" />
+        <PackageReference Update="FSharp.Core" Version="6.0.4" />
     </ItemGroup>
 
 </Project>

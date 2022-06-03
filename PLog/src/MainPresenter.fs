@@ -64,7 +64,7 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
 
     let resetLog () =
         for i = 0 to logPages.Count - 1 do
-            let page = logPages.[i]
+            let page = logPages[i]
             page.LogItems.Clear ()
             page.UnreadCount <- 0
             view.Clear i
@@ -75,7 +75,7 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
         sprintf "%s (%d)" name unreadCount
 
     member this.Init () =
-        let config = Domain.loadConfig ()
+        let config = loadConfig ()
 
         adb <- config.Adb
         dsymFile <- config.DsymFile
@@ -102,7 +102,7 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
     member this.RefreshDevices () =
         disconnect ()
         resetLog ()
-        match Domain.fetchDevices adb with
+        match fetchDevices adb with
         | Error text ->
             view.ShowError text
         | Ok _devices ->
@@ -118,9 +118,9 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
             else
                 resetLog ()
                 connectionId <- connectionId + 1
-                Domain.connectDevice
+                connectDevice
                     adb
-                    (Some devices.[deviceIdx])
+                    (Some devices[deviceIdx])
                     (fun connId items -> runOnMainThread (fun _ -> this.LogItemsReceived connId items))
                     (fun _ -> runOnMainThread (fun _ -> this.Disconnected ()))
                     connectionId
@@ -134,27 +134,27 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
             disconnect ()
 
     member this.Import file =
-        match Domain.readLogFile file with
+        match readLogFile file with
         | Ok lines ->
             lines
-            |> Seq.map Domain.parseLogItem
+            |> Seq.map parseLogItem
             |> this.AddLogItems
         | Error msg ->
             view.ShowError msg
 
     member private this.AddLogItems items =
-        let isNegative item = negative |> Array.exists (fun info -> Domain.matchesFilter info item)
+        let isNegative item = negative |> Array.exists (fun info -> matchesFilter info item)
 
         let matchedItems =
             logPages
             |> Seq.mapi (fun _ page ->
                 items
-                |> Seq.filter (fun item -> item |> isNegative |> not && item |> Domain.matchesFilter page.Filter.Info)
+                |> Seq.filter (fun item -> item |> isNegative |> not && item |> matchesFilter page.Filter.Info)
                 |> Array.ofSeq
             )
             |> List.ofSeq
 
-        let numLines = logPages.[0].LogItems.Count + matchedItems.[0].Length
+        let numLines = logPages[0].LogItems.Count + matchedItems[0].Length
         if numLines > maxLogLines then
             disconnect ()
             sprintf
@@ -185,7 +185,7 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
 
     member this.AddFilter filter =
         let page = LogPage (filter,
-                            logPages.[0].LogItems.FindAll (fun item -> Domain.matchesFilter filter.Info item))
+                            logPages[0].LogItems.FindAll (fun item -> matchesFilter filter.Info item))
         logPages.Add page
 
         view.AppendFilter filter.Name
@@ -212,13 +212,13 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
         if idx <> curPageIdx then
             if idx >= 0 then
                 curPageIdx <- idx
-                logPages.[idx].UnreadCount <- 0
-                view.UpdateFilterLabel idx logPages.[idx].Filter.Name
+                logPages[idx].UnreadCount <- 0
+                view.UpdateFilterLabel idx logPages[idx].Filter.Name
                 view.ShowLogArea idx
-            elif not System.isWindows then
+            elif not isWindows then
                 curPageIdx <- 0
-                logPages.[0].UnreadCount <- 0
-                view.UpdateFilterLabel 0 logPages.[0].Filter.Name
+                logPages[0].UnreadCount <- 0
+                view.UpdateFilterLabel 0 logPages[0].Filter.Name
                 view.ShowLogArea 0
                 view.SelectFilter 0
 
@@ -230,7 +230,7 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
             view.ShowError "No device selected."
         else
             resetLog ()
-            match Domain.logcatClear adb (Some devices.[deviceIdx]) with
+            match logcatClear adb (Some devices[deviceIdx]) with
             | Error text -> view.ShowError text
             | Ok _ -> ()
 
@@ -239,13 +239,13 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
 
     member this.Export (path: string) =
         use stream = new System.IO.StreamWriter (path)
-        for item in logPages.[curPageIdx].LogItems do
+        for item in logPages[curPageIdx].LogItems do
             stream.WriteLine item.Content
 
     member this.GetStacktrace _dsymFile stOption =
         dsymFile <- _dsymFile
         match stOption with
-        | LiveLog -> Live (logPages.[0].LogItems |> Seq.map (fun item -> item.Content) |> List.ofSeq)
+        | LiveLog -> Live (logPages[0].LogItems |> Seq.map (fun item -> item.Content) |> List.ofSeq)
         | LogFile file -> File file
         |> view.OpenStacktrace dsymFile
 
@@ -261,7 +261,7 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
         if devices.Length = 0 then
             view.ShowError "No device selected."
         else
-            let device = devices.[deviceIdx]
+            let device = devices[deviceIdx]
             view.OpenScreenshot adb device (formatDevice device)
 
     member this.ChangeMode _isDark =
@@ -285,7 +285,7 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
         dsymFile <- _dsymFile
         disconnect ()
         let filters = logPages |> Seq.tail |> Seq.map (fun page -> page.Filter) |> List.ofSeq
-        Domain.saveConfig {
+        saveConfig {
             Adb = adb
             DsymFile = dsymFile
             Filters = filters

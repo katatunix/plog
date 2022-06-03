@@ -1,4 +1,5 @@
-﻿module System
+﻿[<AutoOpen>]
+module Common
 
 open System
 open System.Threading

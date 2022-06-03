@@ -55,7 +55,7 @@ type ConfigDialog (adb, maxLogLines, negative: seq<FilterInfo>, callback) as thi
                    "//, 1234" ]
                  |> String.concat Environment.NewLine
 
-        if System.isWindows then
+        if isWindows then
             negativeTextArea.KeyDown.Add (fun e ->
                 if e.Control && e.Key = Keys.V then
                     let str = Clipboard.Instance.Text
@@ -78,7 +78,7 @@ type ConfigDialog (adb, maxLogLines, negative: seq<FilterInfo>, callback) as thi
         let maxLogLines = maxLogStepper.Value |> int
         let negative =
             negativeTextArea.Text
-            |> System.splitLines
+            |> splitLines
             |> Array.choose (fun _line ->
                 let line = _line.Trim ()
                 if line.Length = 0 || line.StartsWith "//" then

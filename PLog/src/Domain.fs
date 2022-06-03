@@ -5,7 +5,7 @@ open System.IO
 open System.Text.RegularExpressions
 open System.Collections.Generic
 open System.Threading
-open Process
+open FsToolkit.ErrorHandling
 
 type Device =
     { Model: string option
@@ -63,7 +63,7 @@ let fetchDevices adb = result {
                     adb
                     (sprintf "-s %s shell getprop" serial)
                     { ShowWindow = false; RedirectStdErr = false }
-                |> Result.toOption
+                |> Option.ofResult
                 |> Option.bind (Seq.tryPick parseDeviceModel)
             { Model = model; Serial = serial }
         )
@@ -100,26 +100,27 @@ let private parseLogItem2 (str: string) =
         if i > -1 then
             let p = str.Substring(0, i).Split([| ' '; '\t' |], StringSplitOptions.RemoveEmptyEntries)
             if p.Length >= 5 then
-                pid <- parseInt p.[2]
-                severity <- match p.[4] with
+                pid <- parseInt p[2]
+                severity <- match p[4] with
                             | "E" -> Err
                             | "W" -> Warning
                             | "D" -> Debug
                             | _ -> Info
             if p.Length >= 6 then
-                tag <- Some p.[5]
+                tag <- Some p[5]
     { Content = str
       Severity = severity
       Tag = tag
       Pid = pid }
 
 let parseLogItem (str : string) =
-    if str.Length < 2 || str.[1] = '/' then
-        parseLogItem1 str
-     else 
-        parseLogItem2 str
-        
-let mainFilter = { Name = "MAIN"; Info = { Tag = None; Pid = None } }
+    if str.Length < 2 || str[1] = '/'
+    then parseLogItem1 str
+    else parseLogItem2 str
+
+let mainFilter =
+    { Name = "MAIN"
+      Info = { Tag = None; Pid = None } }
 
 let connectDevice adb device onItemsReceived onExited (key: 'key) =
     let args =
@@ -189,12 +190,13 @@ let matchesFilter (info: FilterInfo) (logItem: LogItem) =
         | _ -> logItem.Pid = info.Pid
     tagOk && pidOk
 
-let private toOption (str: string) =
-    let str = str.Trim ()
-    if str.Length = 0 then None else Some str
+let private toOption str =
+    if String.IsNullOrWhiteSpace str
+    then None
+    else Some str
 
 let createFilter (name: string) (tag: string) (pid: string) = result {
-    let! name = name |> toOption |> Result.ofOption "Filter name cannot be empty."
+    let! name =  name |> toOption |> Result.requireSome "Filter name cannot be empty."
     let tag = tag |> toOption
     let pid = pid |> toOption
     match tag, pid with
@@ -203,14 +205,14 @@ let createFilter (name: string) (tag: string) (pid: string) = result {
     | _, None ->
         return { Name = name; Info = { Tag = tag; Pid = None } }
     | _, Some pid ->
-        let! pid = pid |> parseInt |> Result.ofOption "PID must be an integer number."
+        let! pid = pid |> parseInt |> Result.requireSome "PID must be an integer number."
         return { Name = name; Info = { Tag = tag; Pid = Some pid } }
 }
 
 let private (+/) p1 p2 = Path.Combine (p1, p2)
 
 let private addr2line =
-    if System.isWindows then
+    if isWindows then
         AppDomain.CurrentDomain.BaseDirectory +/ "addr2line.exe"
     else
         AppDomain.CurrentDomain.BaseDirectory +/ "../Resources" +/ "addr2line"
@@ -219,7 +221,7 @@ let private parseAddresses lines = [
     for line in lines do
         let m = Regex.Match (line, @"#\d+\s+pc\s+(\w+)\s")
         if m.Success then
-            yield m.Groups.[1].Value
+            yield m.Groups[1].Value
 ]
 
 let private getStacktraceFromLive dsymFile lines =
@@ -233,7 +235,7 @@ let private getStacktraceFromLive dsymFile lines =
 let readLogFile path =
     try
         let tenMB_in_bytes = 10485760L
-        if IO.FileInfo(path).Length <= tenMB_in_bytes then
+        if FileInfo(path).Length <= tenMB_in_bytes then
             IO.File.ReadAllLines path |> Ok
         else
             Error "Log file size cannot be bigger than 10 MB."
@@ -255,7 +257,7 @@ let captureScreenshot adb device =
         | None -> ""
         | Some dev -> sprintf "-s %s " dev.Serial
     Process.getOutputStream adb (sprintf "%sexec-out screencap -p" devicePrefix)
-    
+
 let private dataFolder = (Environment.GetFolderPath Environment.SpecialFolder.UserProfile) +/ ".plog"
 let private configFile = dataFolder +/ "config.dat"
 
@@ -278,4 +280,3 @@ let loadConfig () =
                               IsDark = true
                               MaxLogLines = defaultMaxLogLines }
         defaultConfig
-        

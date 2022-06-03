@@ -22,8 +22,8 @@ let mkProcess program args info =
     p.StartInfo.RedirectStandardError <- info.RedirectStdErr
     p.StartInfo.RedirectStandardInput <- true
     p.StartInfo.WorkingDirectory <- AppDomain.CurrentDomain.BaseDirectory
-    p.StartInfo.StandardOutputEncoding <- System.Text.Encoding.UTF8
-    if info.RedirectStdErr then p.StartInfo.StandardErrorEncoding <- System.Text.Encoding.UTF8
+    p.StartInfo.StandardOutputEncoding <- Encoding.UTF8
+    if info.RedirectStdErr then p.StartInfo.StandardErrorEncoding <- Encoding.UTF8
     p
 
 let private startProcess (p: Diagnostics.Process) =
@@ -52,10 +52,11 @@ let start program args info onLineReceived onExited =
             p.BeginErrorReadLine ()
 
         Ok {
-            Kill = fun _ -> p.CancelOutputRead ()
-                            if info.RedirectStdErr then
-                                p.CancelErrorRead ()
-                            try p.Kill () with _ -> ()
+            Kill = fun _ ->
+                p.CancelOutputRead ()
+                if info.RedirectStdErr then
+                    p.CancelErrorRead ()
+                try p.Kill () with _ -> ()
             Wait = p.WaitForExit
         }
     with _ ->

@@ -55,7 +55,8 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
             dsymTextBox.Text <- openDsymDialog.FileName
     )
 
-    let getStacktraceFromFileButton = new Button (Text = "From log file", ToolTip = "Get stacktrace from external log file")
+    let getStacktraceFromFileButton =
+        new Button (Text = "From log file", ToolTip = "Get stacktrace from external log file")
     let openLogFileDialog = new OpenFileDialog (Title = "Select log file to get stacktrace", MultiSelect = false)
 
     let exportFileDialog = new SaveFileDialog (Title = "Export log to text file")
@@ -72,7 +73,10 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
                                     El connectButton; El screenshotButton; El configButton
                                     ]])]
             StretchedRow [
-                El (new Splitter (Panel1 = filterPanel, Panel2 = logPanel, Panel1MinimumSize = 150, Panel2MinimumSize = 300))
+                El (new Splitter (Panel1 = filterPanel,
+                                  Panel2 = logPanel,
+                                  Panel1MinimumSize = 150,
+                                  Panel2MinimumSize = 300))
             ]
             Row [TableEl (Tbl [SPACE
                                Row [El modeCheckBox
@@ -143,13 +147,13 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
             connectButton.Text <- text
 
         member this.AppendLogItems idx items =
-            logAreas.[idx].AppendLines items
+            logAreas[idx].AppendLines items
 
         member this.Clear idx =
-            logAreas.[idx].Clear ()
+            logAreas[idx].Clear ()
 
         member this.GoEnd idx =
-            logAreas.[idx].GoEnd ()
+            logAreas[idx].GoEnd ()
 
         member this.AppendFilter name =
             filterListBox.Items.Add name
@@ -158,14 +162,14 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
             logAreas.Add (mkLogArea isDark)
 
         member this.ShowLogArea idx =
-            logPanel.Content <- logAreas.[idx].GetEtoControl ()
+            logPanel.Content <- logAreas[idx].GetEtoControl ()
 
         member this.SelectFilter idx =
             filterListBox.SelectedIndex <- idx
 
         member this.UpdateFilterLabel idx text =
             let tmp = filterListBox.SelectedIndex
-            filterListBox.Items.[idx] <- ListItem (Text = text)
+            filterListBox.Items[idx] <- ListItem (Text = text)
             filterListBox.SelectedIndex <- tmp
 
         member this.RemoveFilter idx =
@@ -187,14 +191,14 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
             (new ScreenshotDialog (adb, device, deviceTitle)).ShowModal ()
 
         member this.ChangeMode isDark idx lines =
-            logAreas.[idx].Clear ()
-            logAreas.[idx].ChangeMode isDark
-            logAreas.[idx].AppendLines lines
+            logAreas[idx].Clear ()
+            logAreas[idx].ChangeMode isDark
+            logAreas[idx].AppendLines lines
 
         member this.SetModeCheckBox value =
             modeCheckBox.Checked <- System.Nullable(value)
 
         member this.SetWrap value idx lines =
-            logAreas.[idx].Clear ()
-            logAreas.[idx].SetWrap value
-            logAreas.[idx].AppendLines lines
+            logAreas[idx].Clear ()
+            logAreas[idx].SetWrap value
+            logAreas[idx].AppendLines lines

@@ -6,7 +6,11 @@ open EtoUtils
 open System.Threading
 
 type ScreenshotDialog (adb, device, deviceTitle) as this =
-    inherit Dialog (Title = "Screenshot for " + deviceTitle, Size = Size (900, 600), Resizable = true, Maximizable = true)
+    inherit Dialog (
+        Title = "Screenshot for " + deviceTitle,
+        Size = Size (900, 600),
+        Resizable = true,
+        Maximizable = true)
 
     let PAD = Pad (Padding 8)
     let SPACE = Spacing (Size (8, 8))
@@ -62,7 +66,12 @@ type ScreenshotDialog (adb, device, deviceTitle) as this =
         this.Content <-
             mkLayout <| Tbl [
                 StretchedRow [El imageView]
-                Row [TableEl <| Tbl [PAD; SPACE; Row [EmptyElement; El captureButton; El saveButton; El closeButton; EmptyElement]]]
+                Row [
+                    TableEl <| Tbl [
+                        PAD; SPACE
+                        Row [EmptyElement; El captureButton; El saveButton; El closeButton; EmptyElement]
+                    ]
+                ]
             ]
 
         this.AbortButton <- closeButton

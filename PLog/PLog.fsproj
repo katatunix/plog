@@ -6,8 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="src\Result.fs" />
-        <Compile Include="src\System.fs" />
+        <Compile Include="src\Common.fs" />
         <Compile Include="src\IO.fs" />
         <Compile Include="src\Process.fs" />
         <Compile Include="src\Domain.fs" />
@@ -22,8 +21,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Eto.Forms" Version="2.6.0" />
+      <PackageReference Include="Eto.Forms" Version="2.7.0" />
       <PackageReference Include="FSharp.Json" Version="0.4.1" />
+      <PackageReference Include="FsToolkit.ErrorHandling" Version="2.13.0" />
+      <PackageReference Update="FSharp.Core" Version="6.0.4" />
     </ItemGroup>
 
 </Project>

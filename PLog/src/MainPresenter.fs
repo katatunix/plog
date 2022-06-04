@@ -215,7 +215,7 @@ type MainPresenter (view: MainView, runOnMainThread: (unit -> unit) -> unit) =
                 logPages[idx].UnreadCount <- 0
                 view.UpdateFilterLabel idx logPages[idx].Filter.Name
                 view.ShowLogArea idx
-            elif not isWindows then
+            elif not OS.isWindows then
                 curPageIdx <- 0
                 logPages[0].UnreadCount <- 0
                 view.UpdateFilterLabel 0 logPages[0].Filter.Name

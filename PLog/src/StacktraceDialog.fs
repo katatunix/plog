@@ -24,7 +24,7 @@ type StacktraceDialog (dsymFile, logSource) as this =
 
         closeButton.Click.Add (fun _ -> this.Close ())
 
-        if isWindows then
+        if OS.isWindows then
             this.KeyUp.Add (fun e -> if e.Key = Keys.Escape then this.Close ())
 
         this.LoadComplete.Add (fun _ ->

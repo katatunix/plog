@@ -85,7 +85,7 @@ let private parseLogItem1 (str: string) =
             tag <- str.Substring(i + 1, j - i - 1).Trim() |> Some
             let k = str.IndexOf (')', j)
             if k > -1 then
-                pid <- str.Substring(j + 1, k - j - 1) |> parseInt
+                pid <- str.Substring(j + 1, k - j - 1) |> Int.parse
     { Content = str
       Severity = severity
       Tag = tag
@@ -100,7 +100,7 @@ let private parseLogItem2 (str: string) =
         if i > -1 then
             let p = str.Substring(0, i).Split([| ' '; '\t' |], StringSplitOptions.RemoveEmptyEntries)
             if p.Length >= 5 then
-                pid <- parseInt p[2]
+                pid <- Int.parse p[2]
                 severity <- match p[4] with
                             | "E" -> Err
                             | "W" -> Warning
@@ -205,14 +205,14 @@ let createFilter (name: string) (tag: string) (pid: string) = result {
     | _, None ->
         return { Name = name; Info = { Tag = tag; Pid = None } }
     | _, Some pid ->
-        let! pid = pid |> parseInt |> Result.requireSome "PID must be an integer number."
+        let! pid = pid |> Int.parse |> Result.requireSome "PID must be an integer number."
         return { Name = name; Info = { Tag = tag; Pid = Some pid } }
 }
 
 let private (+/) p1 p2 = Path.Combine (p1, p2)
 
 let private addr2line =
-    if isWindows then
+    if OS.isWindows then
         AppDomain.CurrentDomain.BaseDirectory +/ "addr2line.exe"
     else
         AppDomain.CurrentDomain.BaseDirectory +/ "../Resources" +/ "addr2line"

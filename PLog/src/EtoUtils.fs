@@ -39,6 +39,6 @@ let rec mkLayout (Tbl t) =
     ret
 
 let codeFont =
-    if isWindows
+    if OS.isWindows
     then new Font ("Consolas", 9.0f)
     else new Font ("Menlo", 11.0f)

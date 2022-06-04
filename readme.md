@@ -2,22 +2,17 @@ PLog &ndash; a tool for viewing Android log and more
 ===
 
 ## Setup
-* Visual Studio or Rider with F# support.
+* MacOS machine.
 * .NET Core SDK 6.0.
+* JetBrains Rider is recommended.
 
 ## Build
-* Open `PLog.sln` with your Visual Studio.
-* To build macOS version:
-    * Must be built on macOS.
-    * Build project `PLog.Mac`.
-    * Alternatively, you can run `build.mac.sh`.
-* To build Windows version:
-    * Must be built on Windows.
-    * .NET Framework 4.6.2 is required.
-    * Build the project `PLog.Win`.
-    * Alternatively, you can run `build.win.bat`.
+* Run `./fake.sh build`.
+* See output: `PLog.Mac/bin/Release/net6.0/PLog.Mac.app`.
 
 ## Pack
-* Make sure the two projects above have been built.
-* Run `./pack.sh [version]` to copy all output files/folders to the `build` folder. For example: `./pack.sh 8.5`.
-* See the artifacts in the `build` folder.
+* Run `./fake.sh pack [version]`. For example: `./fake.sh pack 8.5`.
+* See the `.dmg` files in the `build` folder.
+
+## TODO
+* Write build script for Windows build. Sorry I don't have any Windows PC at the moment :)

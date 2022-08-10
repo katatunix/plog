@@ -40,15 +40,15 @@ type CrashLogSource =
     | File of string
 
 let private parseDeviceSerial (line: string) =
-    let i = line.IndexOf "\t"
-    if i = -1 then None
-    else Some <| line.Substring(0, i).Trim()
+    match line.IndexOf "\t" with
+    | -1 -> None
+    | i -> line.Substring(0, i).Trim() |> Some
 
 let private parseDeviceModel (line: string) =
     if line.StartsWith "[ro.product.model]" then
-        let i = line.IndexOf ":"
-        if i = -1 then None
-        else Some <| line.Substring(i + 1).Trim()
+        match line.IndexOf ":" with
+        | -1 -> None
+        | i -> line.Substring(i + 1).Trim() |> Some
     else
         None
 

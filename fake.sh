@@ -1,1 +1,1 @@
-dotnet run --project tools/build -- -t "$@"
+dotnet run --project tools/build -- -t $@

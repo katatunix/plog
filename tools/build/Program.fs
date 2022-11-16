@@ -41,7 +41,7 @@ let createTargets () =
                   --window-size 800 400 \
                   --app-drop-link 400 200 \
                   --add-file readme.txt build.sample/readme.txt 550 32 \
-                  build/PLog.Mac.{runtime}.v{version}.dmg PLog.Mac/bin/Release/net6.0/osx-{runtime}/PLog.Mac.app"
+                  build/PLog.Mac.{runtime}.v{version}.dmg PLog.Mac/bin/Release/net7.0/osx-{runtime}/PLog.Mac.app"
             |> Proc.run
             |> ignore
         exec "x64"

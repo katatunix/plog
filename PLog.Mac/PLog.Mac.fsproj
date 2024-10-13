@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 
@@ -15,8 +15,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\PLog\PLog.fsproj" />
-        <PackageReference Include="Eto.Platform.Mac64" Version="2.7.2" />
-        <PackageReference Update="FSharp.Core" Version="7.0.0" />
+        <PackageReference Include="Eto.Platform.Mac64" Version="2.8.3" />
+        <PackageReference Update="FSharp.Core" Version="8.0.401" />
     </ItemGroup>
 
 </Project>

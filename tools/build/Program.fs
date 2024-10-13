@@ -7,8 +7,10 @@ let createTargets () =
     Target.create "clean" <| fun _ ->
         Shell.deleteDirs [
             "build"
-            "PLog.Mac/bin/Release"; "PLog.Mac/obj/Release"
-            "PLog/bin/Release"; "PLog/obj/Release"
+            for project in [ "PLog.Mac"; "PLog" ] do
+                $"{project}/obj"
+                for config in [ "Release"; "Debug" ] do
+                    $"{project}/bin/{config}"
         ]
 
     Target.create "build" <| fun _ ->

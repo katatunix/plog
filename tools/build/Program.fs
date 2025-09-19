@@ -3,7 +3,7 @@ open Fake.DotNet
 open Fake.IO
 open Fake.Core.TargetOperators
 
-let net = "net8.0"
+let net = "net8.0-macos"
 
 let createTargets () =
     Target.create "clean" <| fun _ ->

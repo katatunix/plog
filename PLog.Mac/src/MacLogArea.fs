@@ -2,11 +2,12 @@
 
 open System
 open System.Text
+open System.Runtime.InteropServices
 open Eto.Forms
 open Eto.Drawing
 open EtoUtils
-open MonoMac.Foundation
-open MonoMac.AppKit
+open Foundation
+open AppKit
 
 type Mode =
     { BackColor: Color
@@ -19,25 +20,21 @@ type Mode =
 type MacLogArea (isDark) as this =
     inherit Panel ()
 
-    static let convert (x: int) = float x / 255.0
-
-    static let color r g b = NSColor.FromRgba (convert r, convert g, convert b, 1.0)
-
     static let darkMode =
         { BackColor = Color.FromRgb 0x1e1e1e
-          ErrorColor = NSColor.SystemRedColor
-          WarningColor = NSColor.SystemYellowColor
-          DebugColor = NSColor.SystemGreenColor
-          InfoColor = NSColor.FromRgba (0.9, 0.9, 0.9, 1.0)
-          SelectionColor = color 21 79 142 }
+          ErrorColor = NSColor.SystemRed
+          WarningColor = NSColor.SystemYellow
+          DebugColor = NSColor.SystemGreen
+          InfoColor = NSColor.FromRgb (NFloat(0.9), NFloat(0.9), NFloat(0.9))
+          SelectionColor = NSColor.FromRgb (21, 79, 142) }
 
     static let lightMode =
         { BackColor = Colors.White
-          ErrorColor = color 186 26 30
+          ErrorColor = NSColor.FromRgb (186, 26, 30)
           WarningColor = NSColor.Brown
           DebugColor = NSColor.Blue
           InfoColor = NSColor.Black
-          SelectionColor = color 163 215 255 }
+          SelectionColor = NSColor.FromRgb (163, 215, 255) }
 
     let mutable currentMode = if isDark then darkMode else lightMode
 
@@ -45,7 +42,7 @@ type MacLogArea (isDark) as this =
 
     let SPACE = Spacing (Size (DIST, DIST))
 
-    let font = NSFont.FromFontName ("Menlo", 11.5)
+    let font = NSFont.FromFontName ("Menlo", NFloat(11.5))
 
     let textArea = new TextArea (Wrap = false, ReadOnly = true, BackgroundColor = currentMode.BackColor)
 
@@ -84,7 +81,7 @@ type MacLogArea (isDark) as this =
             MessageBox.Show ("Text not found.", MessageBoxType.Information) |> ignore
         else
             keepEnd <- false
-            let range = NSRange (int64 foundIdx, int64 key.Length)
+            let range = NSRange (foundIdx, key.Length)
             textAreaControl.SelectedRange <- range
             textAreaControl.ScrollRangeToVisible range
             textArea.Focus()
@@ -109,7 +106,7 @@ type MacLogArea (isDark) as this =
     let applyCurrentMode () =
         textArea.BackgroundColor <- currentMode.BackColor
         use attrs = new NSMutableDictionary ()
-        attrs.Add (NSAttributedString.BackgroundColorAttributeName, currentMode.SelectionColor)
+        attrs.Add (NSStringAttributeKey.BackgroundColor, currentMode.SelectionColor)
         textAreaControl.SelectedTextAttributes <- attrs
 
     do
@@ -153,9 +150,9 @@ type MacLogArea (isDark) as this =
             | Domain.Info    -> currentMode.InfoColor
         use str = new NSMutableAttributedString (text)
         use attrs = new NSMutableDictionary ()
-        attrs.Add (NSAttributedString.ForegroundColorAttributeName, color)
-        attrs.Add (NSAttributedString.FontAttributeName, font)
-        str.AddAttributes (attrs, NSRange (0L, str.Length))
+        attrs.Add (NSStringAttributeKey.ForegroundColor, color)
+        attrs.Add (NSStringAttributeKey.Font, font)
+        str.AddAttributes (attrs, NSRange (0, str.Length))
         textAreaControl.TextStorage.Append str
 
     let appendLines lines =
@@ -179,7 +176,7 @@ type MacLogArea (isDark) as this =
             append (collectedString.ToString()) currentSeverity
 
         if keepEnd then
-            textAreaControl.ScrollRangeToVisible <| NSRange (textAreaControl.TextStorage.Length, 0L)
+            textAreaControl.ScrollRangeToVisible <| NSRange (textAreaControl.TextStorage.Length, 0)
 
     let changeMode mode =
         currentMode <- mode
@@ -198,7 +195,7 @@ type MacLogArea (isDark) as this =
 
         member this.GoEnd () =
             keepEnd <- true
-            textAreaControl.ScrollRangeToVisible <| NSRange (int64 textArea.Text.Length, 0L)
+            textAreaControl.ScrollRangeToVisible <| NSRange (textArea.Text.Length, 0)
 
         member this.SetWrap value =
             textArea.Wrap <- value

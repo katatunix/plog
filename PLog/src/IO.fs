@@ -1,12 +1,17 @@
 ﻿module IO
 
 open System.IO
-open FSharp.Json
+open System.Text.Json
+open System.Text.Json.Serialization
 
-let writeValueToFile value (path: string) =
+let options = JsonFSharpOptions.Default().ToJsonSerializerOptions()
+
+let writeValueToFile (value: 'a) (path: string) =
     use stream = new StreamWriter (path)
-    Json.serialize value |> stream.Write
+    JsonSerializer.Serialize(value, options)
+    |> stream.Write
 
 let readValueFromFile (path: string) =
     use stream = new StreamReader (path)
-    stream.ReadToEnd () |> Json.deserialize
+    let str = stream.ReadToEnd()
+    JsonSerializer.Deserialize(str, options)

@@ -13,7 +13,7 @@ PLog &ndash; a tool for viewing Android log and more
 
 ### Windows
 * Run `dotnet publish .\PLog.Win\PLog.Win.fsproj -c Release -f net8.0-windows -r win-x64 -p:SatelliteResourceLanguages=en`.
-* See output `\PLog.Win\bin\Release\net8.0-windows\win-x64\publish`.
+* See output `PLog.Win\bin\Release\net8.0-windows\win-x64\publish`.
 
 ## Pack
 * Run `./fake.sh pack [version]`. For example: `./fake.sh pack 8.5`.

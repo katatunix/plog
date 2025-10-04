@@ -1,0 +1,55 @@
+name: Release on tag (Windows)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+    env:
+      PROJECT_FILE: PLog.Win\PLog.Win.fsproj
+      FRAMEWORK: net8.0-windows
+      RID: win-x64
+      SAT_LANGS: en
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish & zip
+        id: pack
+        shell: pwsh
+        run: |
+          $app   = [IO.Path]::GetFileNameWithoutExtension("$env:PROJECT_FILE")
+          $tag   = "${{ github.ref_name }}"
+          $out   = "$(Resolve-Path .)\out\$env:RID\$app"
+          dotnet publish "$env:PROJECT_FILE" `
+            -c Release -f $env:FRAMEWORK -r $env:RID --self-contained:false `
+            -p:SatelliteResourceLanguages=$env:SAT_LANGS `
+            -p:PublishDir="$out"
+
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          $zip = "artifacts/$app-$tag-$env:RID.zip"
+          Compress-Archive -Path "$out\*" -DestinationPath $zip -Force
+
+          echo "ZIP=$zip" >> $env:GITHUB_OUTPUT
+          echo "APP=$app" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub Release + upload ZIP
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          files: ${{ steps.pack.outputs.ZIP }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

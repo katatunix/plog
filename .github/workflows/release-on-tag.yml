@@ -41,7 +41,7 @@ jobs:
             -p:PublishDir="$out"
 
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          $zip = "artifacts/$app.$ARCH_NAME.$tag.zip"
+          $zip = "artifacts/$app.$env:ARCH_NAME.$tag.zip"
           Compress-Archive -Path "$out\*" -DestinationPath $zip -Force
 
           echo "ZIP=$zip" >> $env:GITHUB_OUTPUT

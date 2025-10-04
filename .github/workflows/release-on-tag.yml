@@ -16,6 +16,7 @@ jobs:
       PROJECT_FILE: PLog.Win\PLog.Win.fsproj
       FRAMEWORK: net8.0-windows
       RID: win-x64
+      ARCH_NAME: x64
       SAT_LANGS: en
 
     steps:
@@ -40,7 +41,7 @@ jobs:
             -p:PublishDir="$out"
 
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          $zip = "artifacts/$app-$tag-$env:RID.zip"
+          $zip = "artifacts/$app.$ARCH_NAME.$tag.zip"
           Compress-Archive -Path "$out\*" -DestinationPath $zip -Force
 
           echo "ZIP=$zip" >> $env:GITHUB_OUTPUT

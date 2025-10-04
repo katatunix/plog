@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36429.23 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PLog", "PLog\PLog.fsproj", "{0299D74F-3A17-487E-B7A4-48351E3C34B1}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PLog.Mac", "PLog.Mac\PLog.Mac.fsproj", "{1C3D9092-5B36-4A84-967C-9AA05C48F9F7}"
@@ -7,6 +10,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{6D5A906D-043F-46D4-8B8B-BC9EC9E1F746}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "build", "tools\build\build.fsproj", "{B9B2E1D9-0EAE-4DDE-854A-CC186DDF52E1}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PLog.Win", "PLog.Win\PLog.Win.fsproj", "{3BF338BF-02A9-DA97-9808-36237352AB1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +31,13 @@ Global
 		{B9B2E1D9-0EAE-4DDE-854A-CC186DDF52E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9B2E1D9-0EAE-4DDE-854A-CC186DDF52E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9B2E1D9-0EAE-4DDE-854A-CC186DDF52E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BF338BF-02A9-DA97-9808-36237352AB1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BF338BF-02A9-DA97-9808-36237352AB1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BF338BF-02A9-DA97-9808-36237352AB1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BF338BF-02A9-DA97-9808-36237352AB1F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B9B2E1D9-0EAE-4DDE-854A-CC186DDF52E1} = {6D5A906D-043F-46D4-8B8B-BC9EC9E1F746}

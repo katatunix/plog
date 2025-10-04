@@ -20,7 +20,5 @@
     <ProjectReference Include="..\PLog\PLog.fsproj" />
     <PackageReference Include="Eto.Platform.Windows" Version="2.10.2" />
     <PackageReference Include="FastColoredTextBox.Net6" Version="1.0.0" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Drawing" />
   </ItemGroup>
 </Project>

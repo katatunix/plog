@@ -2,14 +2,14 @@ PLog &ndash; a tool for viewing Android log and more
 ===
 
 ## Setup
-* MacOS machine.
-* .NET Core SDK 6.0.
+* MacOS or Windows machine.
+* .NET Core SDK 9.0.
 * JetBrains Rider is recommended.
 
 ## Build
 ### Mac OS
 * Run `./fake.sh build`.
-* See output: `PLog.Mac/bin/Release/net6.0/PLog.Mac.app`.
+* See output: `PLog.Mac/bin/Release/net9.0/osx-x64` and `PLog.Mac/bin/Release/net9.0/osx-arm64`.
 
 ### Windows
 * Run `dotnet publish .\PLog.Win\PLog.Win.fsproj -c Release -f net8.0-windows -r win-x64 -p:SatelliteResourceLanguages=en`.
@@ -18,4 +18,3 @@ PLog &ndash; a tool for viewing Android log and more
 ## Pack
 * Run `./fake.sh pack [version]`. For example: `./fake.sh pack 8.5`.
 * See the `.dmg` files in the `build` folder.
-

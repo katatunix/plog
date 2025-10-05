@@ -13,6 +13,11 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "build", "tools\build\build.
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PLog.Win", "PLog.Win\PLog.Win.fsproj", "{3BF338BF-02A9-DA97-9808-36237352AB1F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{761111A6-1504-487D-BA20-20B92D3857A1}"
+	ProjectSection(SolutionItems) = preProject
+		readme.md = readme.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

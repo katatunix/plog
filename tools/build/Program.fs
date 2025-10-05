@@ -3,7 +3,7 @@ open Fake.DotNet
 open Fake.IO
 open Fake.Core.TargetOperators
 
-let net = "net8.0-macos"
+let net = "net9.0"
 
 let createTargets () =
     Target.create "clean" <| fun _ ->
@@ -42,7 +42,7 @@ let createTargets () =
                 "tools/create-dmg/create-dmg"
                 $"--no-internet-enable \
                   --window-pos 200 120 \
-                  --window-size 800 400 \
+                  --window-size 800 480 \
                   --app-drop-link 400 200 \
                   --add-file readme.txt build.sample/readme.txt 550 32 \
                   build/PLog.Mac.{runtime}.v{version}.dmg PLog.Mac/bin/Release/{net}/osx-{runtime}/PLog.Mac.app"

@@ -12,8 +12,8 @@ type MainForm (mkLogArea : bool -> LogArea) as this =
 
     do this.Menu <- new MenuBar ()
 
-    let SPACE = Spacing (Size (5, 5))
-    let PAD = Pad (Padding 5)
+    let SPACE = Spacing (Size (8, 8))
+    let PAD = Pad (Padding 8)
 
     let refreshButton = new Button (Text = "Refresh")
     let deviceListDropDown = new DropDown ()

@@ -12,8 +12,8 @@ PLog &ndash; a tool for viewing Android log and more
 * See output: `PLog.Mac/bin/Release/net9.0/osx-x64` and `PLog.Mac/bin/Release/net9.0/osx-arm64`.
 
 ### Windows
-* Run `dotnet publish .\PLog.Win\PLog.Win.fsproj -c Release -f net8.0-windows -r win-x64 -p:SatelliteResourceLanguages=en`.
-* See output `PLog.Win\bin\Release\net8.0-windows\win-x64\publish`.
+* Run `dotnet publish .\PLog.Win\PLog.Win.fsproj -c Release -r win-x64 -p:SatelliteResourceLanguages=en`.
+* See output `PLog.Win\bin\Release\net9.0-windows7.0\win-x64\publish`.
 
 ## Pack
 * Run `./fake.sh pack [version]`. For example: `./fake.sh pack 8.5`.
